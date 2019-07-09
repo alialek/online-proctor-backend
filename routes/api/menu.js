@@ -61,11 +61,7 @@ router.post(
         description: req.body.description,
         menuType: req.body.menuType,
         isnew: req.body.isnew,
-        image: req.body.image},
-        {$push: {variations: {
-            size: req.body.variation.size,
-            price: req.body.variation.price,
-        }}}]
+        image: req.body.image
       });
 
       const menu = await newMenuItem.save();
