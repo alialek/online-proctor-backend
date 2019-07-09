@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://admin:Lezgiyar05@saintp-x1awt.mongodb.net/nextcup?retryWrites=true&w=majority",
+  "jwtSecret": "nextSecret"
+}
