@@ -8,18 +8,24 @@ const config = require('config');
 const bcrypt = require('bcryptjs');
 
 //@route   Get api/auth
-//@desc    Api route
+//@desc    Get user by ID
 //@access  Public
 
 router.get('/', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'origin, content-type, accept');
     res.json(user);
   } catch (err) {
     console.error(err.message);
     res.status(500).json('Проблема на сервере');
   }
 });
+
+//@route   POST api/auth
+//@desc    Auth user
+//@access  Public
 
 router.post(
   '/',
