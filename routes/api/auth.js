@@ -67,6 +67,13 @@ router.post(
         }
       };
 
+      const newUser = Object.keys(user).reduce((object, key) => {
+        if (key !== 'password') {
+          object[key] = user[key];
+        }
+        return object;
+      }, {});
+
       jwt.sign(
         payload,
         config.get('jwtSecret'),
@@ -75,7 +82,7 @@ router.post(
         },
         (err, token) => {
           if (err) throw err;
-          res.json(token + ',' + user);
+          res.json({ token, user });
           console.log(token);
         }
       );
