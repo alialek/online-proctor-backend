@@ -67,12 +67,10 @@ router.post(
         }
       };
 
-      const newUser = Object.keys(user).reduce((object, key) => {
-        if (key !== 'password') {
-          object[key] = user[key];
-        }
-        return object;
-      }, {});
+      const newUser = {
+        user.email,
+        user.name
+      }
 
       jwt.sign(
         payload,
