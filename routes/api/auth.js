@@ -67,7 +67,8 @@ router.post(
         }
       };
 
-      const {email, name } = user
+      const { email, name } = user;
+      let newUser = { email, name };
 
       jwt.sign(
         payload,
@@ -77,7 +78,7 @@ router.post(
         },
         (err, token) => {
           if (err) throw err;
-          res.json({ token, {email, name} });
+          res.json({ token, newUser });
           console.log(token);
         }
       );
