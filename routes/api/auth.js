@@ -67,8 +67,6 @@ router.post(
         }
       };
 
-      
-
       jwt.sign(
         payload,
         config.get('jwtSecret'),
@@ -77,7 +75,7 @@ router.post(
         },
         (err, token) => {
           if (err) throw err;
-          res.json({ token, user.email, user.name });
+          res.json({ token, user });
           console.log(token);
         }
       );
