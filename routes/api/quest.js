@@ -25,8 +25,9 @@ router.get('/', async (req, res) => {
 //@access  Public
 
 router.get('/:id', async (req, res) => {
+  let id = parseInt(req.params.id);
   try {
-    let quest = await Quest.findOne({ id }).exclude('riddles');
+    let quest = await Quest.findOne({ _id: id }).select('-riddles');
     res.json(quest);
   } catch (err) {
     console.error(err.message);
@@ -39,8 +40,9 @@ router.get('/:id', async (req, res) => {
 //@access  Public
 
 router.get('/:id', async (req, res) => {
+  let id = req.params.id;
   try {
-    let quest = await Quest.findOne({ id }).include('riddles');
+    let quest = await Quest.findOne({ id });
     res.json(quest);
   } catch (err) {
     console.error(err.message);
