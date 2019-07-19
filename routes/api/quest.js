@@ -20,20 +20,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-//@route   Get api/quest/
-//@desc    All Quests
-//@access  Public
-
-router.get('/:id', async (req, res) => {
-  try {
-    let quest = await Quest.findOne({ id }).exclude('riddles');
-    res.json(quest);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json('Проблема на сервере');
-  }
-});
-
 //@route   Get api/quest/id
 //@desc    One Quest by ID
 //@access  Public
