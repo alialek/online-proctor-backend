@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 const config = require('config');
+const auth = require('../../middleware/auth');
 
 //@route   POST api/users
 //@desc    Register
@@ -78,5 +79,18 @@ router.post(
     }
   }
 );
+
+router.get('/quests', auth, async (req, res) => {
+  const id = req.user.id;
+  console.log(id);
+  try {
+    // Проверка на уникальность пользователя
+    let user = await User.findOne({ _id: id });
+    res.json(user.quests);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;
