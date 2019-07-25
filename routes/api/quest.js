@@ -113,8 +113,8 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-//@route   POST api/quest/id?fields=join
-//@desc    Add quest to user profile after clicking join button
+//@route   POST api/quest/:id
+//@desc    Register user in game (just add quest to profile)
 //@access  Authenticated (user)
 
 router.post('/:id', auth, async (req, res) => {
