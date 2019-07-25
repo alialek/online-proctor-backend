@@ -162,20 +162,21 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   try {
     let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
     let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
-    let riddleAnswer = riddle.answer;
+    let riddleAnswer = riddle[0].answer;
 
     if (riddleAnswer == userAnswer) {
       riddle = {
         id: id_riddle + 1
       };
-
       User.updateOne(
         { _id: userID, 'quests.id': id_quest },
         { $push: { 'quests.$.riddles': riddle } },
         function(err, docs) {
-          res.json(riddle);
+          res.json({ success: true });
         }
       );
+    } else {
+      res.json({ success: false });
     }
   } catch (err) {
     console.error(err.message);
