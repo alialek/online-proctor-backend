@@ -156,6 +156,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let userRiddles = user.quests.filter(
     quest => parseInt(quest.id) + 1 === parseInt(id_quest) + 1
   );
+  console.log(userRiddles);
 
   if (userRiddles.length > 1) {
     return res.json({ success: true });
