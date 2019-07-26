@@ -153,35 +153,39 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   //Получаем количество решенных загадок у пользователя в данном квесте
   let userID = req.user.id;
   let user = await User.findOne({ _id: userID });
-  let userRiddles = user.quests.filter(quest => quest.id === id_quest)[0];
+  let userRiddles = user.quests.filter(quest => quest.id === id_quest);
 
-  let userAnswer = req.body.answer;
-  console.log(req);
-  if (!isNaN(userAnswer)) {
-    userAnswer = userAnswer.toLowerCase();
-  }
-  try {
-    let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
-    let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
-    let riddleAnswer = riddle[0].answer;
-
-    if (riddleAnswer == userAnswer) {
-      riddle = {
-        id: id_riddle + 1
-      };
-      User.updateOne(
-        { _id: userID, 'quests.id': id_quest },
-        { $push: { 'quests.$.riddles': riddle } },
-        function(err, docs) {
-          res.json({ success: true });
-        }
-      );
-    } else {
-      res.json({ success: false });
+  if (userRiddles.length > 1) {
+    return res.json({ success: true });
+  } else {
+    let userAnswer = req.body.answer;
+    console.log(req);
+    if (!isNaN(userAnswer)) {
+      userAnswer = userAnswer.toLowerCase();
     }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json('Проблема на сервере');
+    try {
+      let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
+      let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
+      let riddleAnswer = riddle[0].answer;
+
+      if (riddleAnswer == userAnswer) {
+        riddle = {
+          id: id_riddle + 1
+        };
+        User.updateOne(
+          { _id: userID, 'quests.id': id_quest },
+          { $push: { 'quests.$.riddles': riddle } },
+          function(err, docs) {
+            res.json({ success: true });
+          }
+        );
+      } else {
+        res.json({ success: false });
+      }
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json('Проблема на сервере');
+    }
   }
 });
 
