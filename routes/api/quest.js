@@ -161,7 +161,6 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
     return res.json({ success: true });
   } else {
     let userAnswer = req.body.answer;
-    console.log(req);
     if (!isNaN(userAnswer)) {
       userAnswer = userAnswer.toLowerCase();
     }
