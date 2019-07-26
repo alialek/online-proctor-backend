@@ -156,7 +156,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let userRiddles = user.quests.filter(quest => quest.id === id_quest)[0];
 
   let userAnswer = req.body.answer;
-  console.log(userAnswer);
+  console.log(req.body);
   if (!isNaN(userAnswer)) {
     userAnswer = userAnswer.toLowerCase();
   }
