@@ -156,19 +156,42 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let userRiddles = user.quests.filter(
     quest => parseInt(quest.id) + 1 === parseInt(id_quest) + 1
   );
+
+  let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
+  let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
+  let riddleIsRequired = riddle[0].required;
+
   if (userRiddles[0].riddles.length > 1) {
     return res.json({ success: true });
   } else {
-    let userAnswer = req.body.answer;
-    if (!isNaN(userAnswer)) {
-      userAnswer = userAnswer.toLowerCase();
-    }
-    try {
-      let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
-      let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
-      let riddleAnswer = riddle[0].answer;
+    if (riddleIsRequired) {
+      let userAnswer = req.body.answer;
+      if (!isNaN(userAnswer)) {
+        userAnswer = userAnswer.toLowerCase();
+      }
+      try {
+        let riddleAnswer = riddle[0].answer;
 
-      if (riddleAnswer == userAnswer) {
+        if (riddleAnswer == userAnswer) {
+          riddle = {
+            id: id_riddle + 1
+          };
+          User.updateOne(
+            { _id: userID, 'quests.id': id_quest },
+            { $push: { 'quests.$.riddles': riddle } },
+            function(err, docs) {
+              res.json({ success: true });
+            }
+          );
+        } else {
+          res.json({ success: false });
+        }
+      } catch (err) {
+        console.error(err.message);
+        res.status(500).json('Проблема на сервере');
+      }
+    } else {
+      try {
         riddle = {
           id: id_riddle + 1
         };
@@ -179,12 +202,10 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
             res.json({ success: true });
           }
         );
-      } else {
-        res.json({ success: false });
+      } catch (error) {
+        console.error(err.message);
+        res.status(500).json('Проблема на сервере');
       }
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).json('Проблема на сервере');
     }
   }
 });
