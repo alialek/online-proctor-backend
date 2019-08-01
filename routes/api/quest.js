@@ -161,7 +161,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
   let riddleIsRequired = riddle[0].required;
 
-  if (userRiddles[0].riddles.length > 1) {
+  if (userRiddles[0].riddles.length > id_riddle) {
     return res.json({ success: true });
   } else {
     if (riddleIsRequired) {
