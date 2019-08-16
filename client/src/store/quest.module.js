@@ -17,7 +17,10 @@ export const quest = {
         _id: '',
         title: 'Загрузка',
         tags: {
-          typeTeam: ''
+          typeTeam: '',
+          location: '',
+          typeGenre: '',
+          typeTime: ''
         }
       }
     ],
@@ -26,12 +29,12 @@ export const quest = {
         title: 'Загрузка...'
       }
     ],
-    isLoading: false,
+    loading: false,
     success: true
   },
   actions: {
     getEvents(context) {
-      this.state.isLoading = true;
+      context.commit('setLoading');
       try {
         questService.getEvents().then(data => {
           context.commit('setEvents', data.data);
@@ -41,7 +44,7 @@ export const quest = {
       }
     },
     getEventByID(context, id) {
-      this.state.isLoading = true;
+      context.commit('setLoading');
       try {
         questService.getEventByID(id).then(data => {
           context.commit('setEvent', data.data);
@@ -51,7 +54,7 @@ export const quest = {
       }
     },
     getEventByIDAndRiddles(context, id) {
-      this.state.isLoading = true;
+      context.commit('setLoading');
       try {
         questService.getEventByIDAndRiddles(id).then(data => {
           context.commit('setEvent', data.data);
@@ -61,7 +64,7 @@ export const quest = {
       }
     },
     getRiddle(context, params) {
-      this.state.isLoading = true;
+      context.commit('setLoading');
       let questID = params.id;
       let riddleID = params.riddle_id;
       try {
@@ -73,7 +76,7 @@ export const quest = {
       }
     },
     postAnswer(context, params) {
-      this.state.isLoading = true;
+      context.commit('setLoading');
       let questID = params.questID;
       let riddleID = params.riddleID;
       let answer = params.answer;
@@ -89,17 +92,20 @@ export const quest = {
     }
   },
   mutations: {
+    setLoading(state) {
+      state.loading = true;
+    },
     setEvents(state, res) {
-      this.state.isLoading = false;
+      state.loading = false;
       state.events = res;
     },
     setEvent(state, res) {
       state.event = res;
-      this.state.isLoading = false;
+      state.loading = false;
     },
     setRiddle(state, res) {
       state.riddle = res;
-      this.state.isLoading = false;
+      state.loading = false;
     },
     setIsSucceed(state, res) {
       if (res.success) {
@@ -113,7 +119,7 @@ export const quest = {
       } else {
         this.state.success = false;
       }
-      this.state.isLoading = false;
+      state.loading = false;
     }
   },
   getters: {

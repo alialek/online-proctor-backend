@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="application">
     <router-view></router-view>
     <Navbar v-if="isLogged" />
   </v-app>
@@ -28,5 +28,13 @@ export default {
 <style>
 a {
   text-decoration: none;
+}
+@media (min-width: 600px) {
+  .application {
+    width: 480px;
+    height: 720px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
 }
 </style>

@@ -5,6 +5,8 @@ import store from './store';
 import Vuetify from 'vuetify/lib';
 import 'vuetify/dist/vuetify.min.css';
 import axios from 'axios';
+import VueGeolocation from 'vue-browser-geolocation';
+Vue.use(VueGeolocation);
 
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 

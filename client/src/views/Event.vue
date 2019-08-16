@@ -24,7 +24,7 @@
 
       <v-spacer></v-spacer>
     </v-toolbar>
-    <section class="content">
+    <v-flex v-if="event" xs12 class="content">
       <v-layout>
         <v-flex column class="d-flex flex-column justify-center align-center align-content-center">
           <v-icon large dark color="green">group</v-icon>
@@ -61,10 +61,9 @@
       <v-card flat>
         <v-card-text class="pl-2 pr-2">{{event.rules}}</v-card-text>
       </v-card>
-    </section>
+    </v-flex>
     <v-dialog v-model="dialog" max-width="290">
       <v-card class="d-flex fluid justify-content-center">
-        <v-progress-circular centered indeterminate color="primary" v-if="loading"></v-progress-circular>
         <div v-if="!loading">
           <v-card-title class="headline">Подтвердите участие</v-card-title>
 

@@ -5,15 +5,18 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "dev": "vue-cli-service cordova-serve",
+    "prod": "vue-cli-service cordova-production",
+    "release": "vue-cli-service cordova-release"
   },
-  "proxy": "http://localhost:8938",
   "dependencies": {
     "axios": "^0.19.0",
     "core-js": "^2.6.5",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vue": "^2.6.10",
+    "vue-browser-geolocation": "^1.8.0",
     "vue-router": "^3.0.3",
     "vuetify": "^1.5.16",
     "vuex": "^3.0.1"
@@ -23,13 +26,16 @@
     "@vue/cli-plugin-eslint": "^3.9.0",
     "@vue/cli-service": "^3.9.0",
     "babel-eslint": "^10.0.1",
+    "cross-spawn": "^6.0.5",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "vue-cli-plugin-vuetify": "^0.5.0",
+    "vue-cli-plugin-vuetify-cordova": "0.0.13",
     "vue-template-compiler": "^2.6.10",
-    "vuetify-loader": "^1.0.5"
+    "vuetify-loader": "^1.0.5",
+    "xml2js": "^0.4.19"
   },
   "eslintConfig": {
     "root": true,
@@ -53,5 +59,20 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-device": {},
+      "cordova-plugin-ionic-webview": {},
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-whitelist": {}
+    },
+    "platforms": [
+      "android",
+      "browser",
+      "ios"
+    ]
+  },
+  "proxy": "http://localhost:8938"
 }

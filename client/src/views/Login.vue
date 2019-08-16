@@ -1,56 +1,61 @@
 <template>
   <section class="login">
-    <div class="left bg-image-holder">
-      <img class="bg-image right-image" src="../../public/svg/blue.svg" />
-    </div>
-    <div class="center bg-image-holder">
-      <img class="bg-image center-image" src="../../public/svg/black.svg" />
-      <h2
-        style="position: absolute; color: white; font-size: 30px; margin-top: 25%; margin-left: 7%;"
-      >
-        Добро
-        <br />Пожаловать
-      </h2>
-    </div>
-    <div class="right bg-image-holder">
-      <img class="bg-image left-image" src="../../public/svg/orange.svg" />
-    </div>
-    <v-container>
-      <v-layout
-        style="width: 100%;position: absolute; z-index: 9999; height: 65%; background-color: white; bottom: 0; left: 0; border-radius: 30px 30px 0px 0px;"
-        align-center
-        justify-center
-      >
-        <v-flex class="mx-3">
-          <v-tabs style="width: 100%;" grow centered color="transparent" slider-color="orange">
-            <v-tab ripple>Вход</v-tab>
-            <v-tab ripple>Регистрация</v-tab>
-            <v-tab-item>
-              <v-form @submit.prevent="handleAuth">
-                <v-text-field v-model="email" label="E-mail" required></v-text-field>
-                <v-text-field v-model="password" type="password" label="Пароль" required></v-text-field>
-                <v-layout justify-space-between align-center>
-                  <span style="font-size:30px; font-weight: 600; align-item">Войти</span>
-                  <v-btn fab type="submit" style="background-color: #353941; color: white;">
-                    <v-icon>arrow_right</v-icon>
-                  </v-btn>
-                </v-layout>
-              </v-form>
-            </v-tab-item>
-            <v-tab-item>
-              <v-form @submit.prevent="handleReg">
-                <v-text-field v-model="name" label="Имя" required></v-text-field>
-                <v-text-field v-model="email" label="E-mail" required></v-text-field>
-                <v-text-field v-model="password" type="password" label="Пароль" required></v-text-field>
-                <v-layout justify-space-between align-center>
-                  <span style="font-size:30px; font-weight: 600; align-item">Регистрация</span>
-                  <v-btn fab type="submit" style="background-color: #353941; color: white;">
-                    <v-icon>lock</v-icon>
-                  </v-btn>
-                </v-layout>
-              </v-form>
-            </v-tab-item>
-          </v-tabs>
+    <v-container style="height: 100%" dark>
+      <v-layout style="height: 100%" align-center align-content-center justify-center dark>
+        <v-flex class="mx-3 col-xs-12 col-md-6">
+          <h2
+            style="font-size:40px;text-align:center;color: white; font-family: Montserrat"
+          >NetQuest</h2>
+          <transition appear>
+            <v-tabs
+              style="width: 100%;"
+              dark
+              grow
+              centered
+              color="transparent"
+              slider-color="orange"
+            >
+              <v-tab ripple>Вход</v-tab>
+              <v-tab ripple>Я играю впервые</v-tab>
+              <v-tab-item>
+                <v-form dark @submit.prevent="handleAuth">
+                  <v-text-field dark v-model="email" label="E-mail" required></v-text-field>
+                  <v-text-field dark v-model="password" type="password" label="Пароль" required></v-text-field>
+                  <v-layout justify-left align-center>
+                    <span style="font-size:30px; font-weight: 600; color: white">Войти</span>
+                    <v-btn
+                      :loading="loading"
+                      fab
+                      type="submit"
+                      style="background-color: white; color: black;"
+                    >
+                      <v-icon>send</v-icon>
+                    </v-btn>
+                  </v-layout>
+                </v-form>
+              </v-tab-item>
+              <v-tab-item>
+                <v-form dark @submit.prevent="handleReg">
+                  <v-text-field dark v-model="name" label="Фамилия и Имя" required></v-text-field>
+
+                  <v-text-field dark v-model="email" label="E-mail" required></v-text-field>
+                  <v-text-field dark v-model="password" type="password" label="Пароль" required></v-text-field>
+                  <v-layout align-center>
+                    <span style="font-size:30px; font-weight: 600; color: white">В игру</span>
+                    <v-btn
+                      fab
+                      :loading="loading"
+                      type="submit"
+                      class="mx-2"
+                      style="background-color: white; color: black;"
+                    >
+                      <v-icon :loading="loading">lock</v-icon>
+                    </v-btn>
+                  </v-layout>
+                </v-form>
+              </v-tab-item>
+            </v-tabs>
+          </transition>
         </v-flex>
       </v-layout>
     </v-container>
@@ -58,6 +63,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "Login",
   components: {},
@@ -65,10 +71,16 @@ export default {
     return {
       name: "",
       email: "",
-      password: ""
+      password: "",
+      date: "",
+      menu: false
     };
   },
-  created() {},
+  computed: {
+    ...mapState("authentication", {
+      loading: state => state.loading
+    })
+  },
   methods: {
     handleAuth() {
       const { email, password } = this;
@@ -91,7 +103,12 @@ export default {
 <style scoped>
 .login {
   width: 100%;
-  background-color: #353942;
+  background: linear-gradient(221deg, #8d00ff, #4260db);
+  background-size: 400% 400%;
+
+  -webkit-animation: loginsection 40s ease infinite;
+  -moz-animation: loginsection 40s ease infinite;
+  animation: loginsection 40s ease infinite;
   height: 100%;
 }
 
@@ -102,28 +119,39 @@ export default {
   height: 300px;
   overflow: hidden;
 }
-.right {
-  right: 0;
-}
-.left {
-  left: 0;
-}
-.center {
-  left: 0;
-}
 
-.bg-image {
-  height: 100%;
-  position: absolute;
+@-webkit-keyframes loginsection {
+  0% {
+    background-position: 0% 90%;
+  }
+  50% {
+    background-position: 100% 11%;
+  }
+  100% {
+    background-position: 0% 90%;
+  }
 }
-
-.right-image {
-  right: -20%;
+@-moz-keyframes loginsection {
+  0% {
+    background-position: 0% 90%;
+  }
+  50% {
+    background-position: 100% 11%;
+  }
+  100% {
+    background-position: 0% 90%;
+  }
 }
-
-.left-image {
-  width: 100%;
-  left: -20%;
+@keyframes loginsection {
+  0% {
+    background-position: 0% 90%;
+  }
+  50% {
+    background-position: 100% 11%;
+  }
+  100% {
+    background-position: 0% 90%;
+  }
 }
 </style>
 

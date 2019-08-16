@@ -22,23 +22,26 @@
           class="title text-xs-left task-text"
         ></v-card-text>
 
-        <v-card-actions class="align-content-center">
-          <v-text-field
-            v-model="answer"
-            v-if="riddle.required"
-            class="ml-2 mt-3"
-            light
-            solo
-            placeholder="Ответ"
-          ></v-text-field>
-          <v-card-text
-            v-if="!riddle.required"
-            class="headline mb-3 align-right text-xs-right font-weight-bold"
-          >Далее</v-card-text>
-          <v-btn class="mx-2 mb-3" @click="postAnswer" fab dark color="green darken-1">
-            <v-icon dark v-if="!isLoading">arrow_right</v-icon>
-            <v-progress-circular v-if="isLoading" indeterminate color="amber"></v-progress-circular>
-          </v-btn>
+        <v-card-actions v-if="!riddle.last" class="align-content-center">
+          <v-form @submit.prevent="geoInfo">
+            <v-layout align-center justify-space-between>
+              <v-text-field
+                v-model="answer"
+                v-if="riddle.required"
+                class="ml-2 mt-3"
+                light
+                solo
+                placeholder="Ответ"
+              ></v-text-field>
+              <v-card-text
+                v-if="!riddle.required"
+                class="headline mb-3 align-right text-xs-right font-weight-bold"
+              >Далее</v-card-text>
+              <v-btn :loading="loading" class="ml-2 mb-3" fab dark color="green darken-1">
+                <v-icon dark>arrow_right</v-icon>
+              </v-btn>
+            </v-layout>
+          </v-form>
         </v-card-actions>
         <p v-if="!success">Неправильный ответ</p>
       </v-card>
@@ -47,7 +50,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
   name: "Riddle",
   components: {},
@@ -58,6 +61,11 @@ export default {
     };
   },
   methods: {
+    geoInfo() {
+      this.$getLocation({ enableHighAccuracy: true }).then(coordinates => {
+        console.log(coordinates);
+      });
+    },
     postAnswer() {
       this.isLoading = true;
       this.$store.dispatch("quest/postAnswer", {
@@ -72,12 +80,16 @@ export default {
     ...mapGetters({
       riddle: "quest/riddle"
     }),
+    ...mapState("quest", {
+      loading: state => state.loading
+    }),
     success() {
       return this.$store.state.quest.success;
     }
   },
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
+    this.geoInfo;
   },
   watch: {
     $route() {

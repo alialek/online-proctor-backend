@@ -28,21 +28,35 @@ export default {
     msg: String
   },
   data() {
-    return {
-      bottomNav: 1
-    };
+    return {};
   },
   computed: {
     color() {
-      switch (this.bottomNav) {
-        case 0:
+      switch (this.$route.name) {
+        case "profile":
           return "#353941";
-        case 1:
+        case "events":
           return "#4ab8e1";
-        case 2:
+        case "teams":
           return "#ffab2d";
-        default:
+        case "Riddle":
           return "black";
+        default:
+          return "#4ab8e1";
+      }
+    },
+    bottomNav() {
+      switch (this.$route.name) {
+        case "profile":
+          return 0;
+        case "events":
+          return 1;
+        case "teams":
+          return 2;
+        case "Riddle":
+          return 1;
+        default:
+          return 1;
       }
     }
   }

@@ -1,51 +1,34 @@
 <template>
-  <section class="events">
-    <div class="header">
-      <div class="header__name">События</div>
-      <div class="header__sub">Актуальное</div>
-      <v-flex xs12 style="z-index: 999; margin-top: 5px;">
-        <router-link :to="'/event/'+actualEvent[0]._id">
-          <v-card
-            v-if="actualEvent[0]"
-            ripple
-            color="white darken-2"
-            class="blue--text"
-            style="border-radius: 5px;"
-          >
-            <v-layout>
-              <v-flex xs5>
-                <v-img :src="actualEvent[0].image" style="border-radius: 5px;" height="100%" cover></v-img>
-              </v-flex>
-              <v-flex xs7>
-                <v-card-title>
-                  <div>
-                    <div class="headline">{{actualEvent[0].title}}</div>
-                    <div>{{actualEvent[0].dateStart}}</div>
-                  </div>
-                </v-card-title>
-              </v-flex>
-            </v-layout>
-          </v-card>
-        </router-link>
-      </v-flex>
-    </div>
-    <v-container v-if="events" class="contents">
-      <v-layout>
-        <h2 class="content__subheader">Предстоящие игры</h2>
-      </v-layout>
-      <v-layout class="mt-2 mb-2" v-for="event in events" :key="event.id">
-        <v-flex xs12>
-          <router-link :to="'/event/'+event._id">
-            <v-card style="border-radius: 5px;" ripple color="white darken-2" class="blue--text">
+  <div>
+    <section class="events">
+      <div class="header">
+        <div class="header__name">События</div>
+        <div class="header__sub">Актуальное</div>
+        <v-flex xs12 style="z-index: 999; margin-top: 5px;">
+          <router-link :to="'/event/'+actualEvent[0]._id">
+            <v-card
+              v-if="actualEvent[0]"
+              ripple
+              elevation="24"
+              color="white darken-2"
+              class="blue--text"
+              style="border-radius: 5px;"
+            >
               <v-layout>
                 <v-flex xs5>
-                  <v-img :src="event.image" height="100px" style="border-radius: 5px; " cover></v-img>
+                  <v-img
+                    :src="actualEvent[0].image"
+                    style="border-radius: 5px;"
+                    height="100%"
+                    cover
+                  ></v-img>
                 </v-flex>
                 <v-flex xs7>
                   <v-card-title>
                     <div>
-                      <div class="headline">{{event.title}}</div>
-                      <div>{{event.dateStart}}</div>
+                      <div class="headline">{{actualEvent[0].title}}</div>
+                      <div>{{actualEvent[0].dateStart}}</div>
+                      <v-progress-circular indeterminate color="primary" v-if="loading"></v-progress-circular>
                     </div>
                   </v-card-title>
                 </v-flex>
@@ -53,13 +36,39 @@
             </v-card>
           </router-link>
         </v-flex>
-      </v-layout>
-    </v-container>
-  </section>
+      </div>
+      <v-container v-if="events" class="contents">
+        <v-layout>
+          <h2 class="content__subheader">Предстоящие игры</h2>
+        </v-layout>
+        <v-layout class="mt-2 mb-2" style="z-index: 1" v-for="event in events" :key="event.id">
+          <v-flex xs12>
+            <router-link :to="'/event/'+event._id">
+              <v-card style="border-radius: 5px;" ripple color="white darken-2" class="blue--text">
+                <v-layout>
+                  <v-flex xs5>
+                    <v-img :src="event.image" height="100px" style="border-radius: 5px; " cover></v-img>
+                  </v-flex>
+                  <v-flex xs7>
+                    <v-card-title>
+                      <div>
+                        <div class="headline">{{event.title}}</div>
+                        <div>{{event.dateStart}}</div>
+                      </div>
+                    </v-card-title>
+                  </v-flex>
+                </v-layout>
+              </v-card>
+            </router-link>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </section>
+  </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
   name: "Events",
   components: {},
@@ -70,6 +79,9 @@ export default {
     ...mapGetters({
       events: "quest/events",
       actualEvent: "quest/actualEvent"
+    }),
+    ...mapState("quest", {
+      loading: state => state.loading
     })
   },
   methods: {
@@ -121,6 +133,7 @@ export default {
 .contents {
   padding-top: 240px;
   padding-bottom: 40px;
+  overflow: hidden;
 }
 
 .content__subheader {

@@ -3,8 +3,8 @@ import router from '../router';
 
 const user = JSON.parse(localStorage.getItem('user'));
 const initialState = user
-  ? { status: { loggedIn: true }, user }
-  : { status: { loggedIn: false }, user: null };
+  ? { status: { loggedIn: true }, user, loading: false }
+  : { status: { loggedIn: false }, user: null, loading: false };
 
 export const authentication = {
   namespaced: true,
@@ -46,14 +46,17 @@ export const authentication = {
     loginRequest(state, user) {
       state.status = { loggingIn: true };
       state.user = user;
+      state.loading = true;
     },
     loginSuccess(state, user) {
       state.status = { loggedIn: true };
       state.user = user;
+      state.loading = false;
     },
     loginFailure(state) {
       state.status = {};
       state.user = null;
+      state.loading = false;
     },
     logout(state) {
       state.status = {};
