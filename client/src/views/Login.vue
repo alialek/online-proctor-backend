@@ -26,7 +26,7 @@
             <v-tab ripple>Вход</v-tab>
             <v-tab ripple>Регистрация</v-tab>
             <v-tab-item>
-              <v-form @submit="handleAuth">
+              <v-form @submit.prevent="handleAuth">
                 <v-text-field v-model="email" label="E-mail" required></v-text-field>
                 <v-text-field v-model="password" type="password" label="Пароль" required></v-text-field>
                 <v-layout justify-space-between align-center>
@@ -38,7 +38,7 @@
               </v-form>
             </v-tab-item>
             <v-tab-item>
-              <v-form @submit="handleReg">
+              <v-form @submit.prevent="handleReg">
                 <v-text-field v-model="name" label="Имя" required></v-text-field>
                 <v-text-field v-model="email" label="E-mail" required></v-text-field>
                 <v-text-field v-model="password" type="password" label="Пароль" required></v-text-field>
