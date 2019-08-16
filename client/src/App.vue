@@ -19,7 +19,6 @@ export default {
       return this.$store.state.authentication.status.loggedIn;
     },
     isLoading() {
-      console.log(this.$store.state.quest.isLoading);
       return this.$store.state.quest.isLoading;
     }
   }

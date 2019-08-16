@@ -42,7 +42,7 @@ export default {
         case 2:
           return "#ffab2d";
         default:
-          return black;
+          return "black";
       }
     }
   }

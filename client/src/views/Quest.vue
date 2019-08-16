@@ -17,7 +17,7 @@
     </v-toolbar>
     <section class="content">
       <v-list>
-        <v-list-tile v-for="item in items" :key="item.title" avatar @click>
+        <v-list-tile v-for="item in items" :key="item.title" avatar>
           <v-list-tile-avatar>
             <img :src="item.avatar" />
           </v-list-tile-avatar>

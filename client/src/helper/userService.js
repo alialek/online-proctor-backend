@@ -2,7 +2,6 @@ import authHeader from './authHeader';
 import axios from 'axios';
 
 const apiUrl = 'https://netquest-server.herokuapp.com';
-const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
 
 function login(email, password) {
   const requestOptions = {

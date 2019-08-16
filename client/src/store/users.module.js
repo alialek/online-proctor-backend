@@ -10,18 +10,12 @@ export const users = {
     getUserQuestsByID({ commit }) {
       userService
         .getUserQuestsByID()
-        .then(
-          quests => commit('getQuests', quests.data),
-          error => console.log(error)
-        );
+        .then(quests => commit('getQuests', quests.data), error => '');
     },
     gameRegister({ commit }, questID) {
       userService
         .gameRegister(questID)
-        .then(
-          quests => commit('getQuests', quests.data),
-          error => console.log(error)
-        );
+        .then(quests => commit('getQuests', quests.data), error => '');
     }
   },
   getters: {

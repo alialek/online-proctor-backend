@@ -32,13 +32,11 @@ export const quest = {
   actions: {
     getEvents(context) {
       this.state.isLoading = true;
-      console.log(this.state.isLoading);
       try {
         questService.getEvents().then(data => {
           context.commit('setEvents', data.data);
         });
       } catch (error) {
-        console.log(error);
         this.state.isLoading = false;
       }
     },
@@ -49,7 +47,6 @@ export const quest = {
           context.commit('setEvent', data.data);
         });
       } catch (error) {
-        console.log(error);
         this.state.isLoading = false;
       }
     },
@@ -60,7 +57,6 @@ export const quest = {
           context.commit('setEvent', data.data);
         });
       } catch (error) {
-        console.log(error);
         this.state.isLoading = false;
       }
     },
@@ -73,7 +69,6 @@ export const quest = {
           context.commit('setRiddle', data.data);
         });
       } catch (error) {
-        console.log(error);
         this.state.isLoading = false;
       }
     },
@@ -89,7 +84,6 @@ export const quest = {
           });
         });
       } catch (error) {
-        console.log(error);
         this.state.isLoading = false;
       }
     }
@@ -108,7 +102,6 @@ export const quest = {
       this.state.isLoading = false;
     },
     setIsSucceed(state, res) {
-      console.log(res.success);
       if (res.success) {
         this.state.success = true;
         router.push(

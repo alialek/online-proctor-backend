@@ -80,7 +80,7 @@ export default {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
   },
   watch: {
-    $route(to, from) {
+    $route() {
       this.$store.dispatch("quest/getRiddle", this.$route.params);
       this.answer = "";
     }
