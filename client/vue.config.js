@@ -1,3 +1,5 @@
 module.exports = {
-  publicPath: `${process.cwd()}/dist/`
+  project: {
+    publicPath: ''
+  }
 };
