@@ -1,5 +1,1 @@
-module.exports = {
-  project: {
-    publicPath: ''
-  }
-};
+module.exports = {};
