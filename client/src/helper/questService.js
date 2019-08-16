@@ -2,32 +2,29 @@ import authHeader from './authHeader';
 import axios from 'axios';
 
 const apiUrl = 'https://netquest-server.herokuapp.com';
-const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+const proxyUrl = '';
 
 async function getEvents() {
-  return await axios.get(proxyUrl + `${apiUrl}/api/quest`);
+  return await axios.get(`${apiUrl}/api/quest`);
 }
 
 //Продумать ответ, если пользователь неавторизован
 async function getEventByID(id) {
-  return await axios.get(proxyUrl + `${apiUrl}/api/quest/` + id, {
+  return await axios.get(`${apiUrl}/api/quest/` + id, {
     headers: authHeader()
   });
 }
 
 //На будущее - вариант квеста с решением загадок на скорость, когда доступны все сразу (в высоком качестве без регистрации и СМС)
 async function getEventByIDAndRiddles(id) {
-  return await axios.get(proxyUrl + `${apiUrl}/api/quest/` + id + '?riddles');
+  return await axios.get(`${apiUrl}/api/quest/` + id + '?riddles');
 }
 
 //Получить одну загадку
 async function getRiddle(questID, riddleID) {
-  return await axios.get(
-    proxyUrl + `${apiUrl}/api/quest/` + questID + '/' + riddleID,
-    {
-      headers: authHeader()
-    }
-  );
+  return await axios.get(`${apiUrl}/api/quest/` + questID + '/' + riddleID, {
+    headers: authHeader()
+  });
 }
 
 function postAnswer(questID, riddleID, answer) {
@@ -38,7 +35,7 @@ function postAnswer(questID, riddleID, answer) {
   };
 
   return fetch(
-    proxyUrl + `${apiUrl}/api/quest/` + questID + '/' + riddleID,
+    `${apiUrl}/api/quest/` + questID + '/' + riddleID,
     requestOptions
   );
 }
