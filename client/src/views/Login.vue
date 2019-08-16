@@ -21,7 +21,7 @@
         align-center
         justify-center
       >
-        <v-form class="mx-3">
+        <v-flex class="mx-3">
           <v-tabs style="width: 100%;" grow centered color="transparent" slider-color="orange">
             <v-tab ripple>Вход</v-tab>
             <v-tab ripple>Регистрация</v-tab>
@@ -51,7 +51,7 @@
               </v-form>
             </v-tab-item>
           </v-tabs>
-        </v-form>
+        </v-flex>
       </v-layout>
     </v-container>
   </section>
