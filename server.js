@@ -1,11 +1,11 @@
 const express = require('express');
 const connectDB = require('./config/db');
-
 const app = express();
 const path = require('path');
+const cors = require('cors');
 
 connectDB();
-
+app.use(cors());
 app.use(express.json({ extended: false }));
 
 app.use('/api/users', require('./routes/api/users'));
