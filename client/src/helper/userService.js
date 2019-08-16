@@ -11,7 +11,7 @@ function login(email, password) {
     body: JSON.stringify({ email, password })
   };
 
-  return fetch(proxyUrl + `${apiUrl}/api/auth`, requestOptions)
+  return fetch(`${apiUrl}/api/auth`, requestOptions)
     .then(handleResponse)
     .then(user => {
       // login successful if there's a jwt token in the respons
@@ -28,7 +28,7 @@ function logout() {
 }
 
 async function getUserQuestsByID() {
-  return await axios.get(proxyUrl + `${apiUrl}/api/users/quests`, {
+  return await axios.get(`${apiUrl}/api/users/quests`, {
     headers: authHeader()
   });
 }
@@ -39,7 +39,7 @@ function gameRegister(questID) {
     headers: authHeader()
   };
 
-  return fetch(proxyUrl + `${apiUrl}/api/quest/` + questID, requestOptions);
+  return fetch(`${apiUrl}/api/quest/` + questID, requestOptions);
 }
 
 function register(name, email, password) {
@@ -49,7 +49,7 @@ function register(name, email, password) {
     body: JSON.stringify({ name, email, password })
   };
 
-  return fetch(proxyUrl + `${apiUrl}/api/users`, requestOptions)
+  return fetch(`${apiUrl}/api/users`, requestOptions)
     .then(handleResponse)
     .then(user => {
       // login successful if there's a jwt token in the response
