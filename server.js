@@ -2,12 +2,20 @@ const express = require('express');
 const connectDB = require('./config/db');
 
 const app = express();
+const path = require('path');
+
+// ... other app.use middleware
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+// ...
+// Right before your app.listen(), add this:
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
 
 connectDB();
 
 app.use(express.json({ extended: false }));
-
-app.get('/', (req, res) => res.send('API running'));
 
 app.use('/api/users', require('./routes/api/users'));
 app.use('/api/quest', require('./routes/api/quest'));
