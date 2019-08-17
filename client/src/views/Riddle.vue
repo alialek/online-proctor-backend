@@ -17,7 +17,11 @@
           @click="overlay = !overlay"
         >Show Overlay</v-btn>
 
-        <iframe style="width: 100%; height: 60vh" src="https://net-quest.ru/ar/index.html"></iframe>
+        <iframe
+          allow="camera"
+          style="width: 100%; height: 60vh"
+          src="https://net-quest.ru/ar/index.html"
+        ></iframe>
       </div>
       <v-card
         v-else
