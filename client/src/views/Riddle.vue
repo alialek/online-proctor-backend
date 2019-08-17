@@ -10,7 +10,12 @@
     </v-toolbar>
 
     <section class="content">
-      <v-card class="mx-auto task-card grey darken-3" dark max-width="90%">
+      <v-card
+        class="mx-auto task-card grey darken-3"
+        style="margin-bottom: 120px"
+        dark
+        max-width="90%"
+      >
         <v-card-title>
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
@@ -26,9 +31,10 @@
     </section>
 
     <v-form
-      style="bottom:60px; position: absolute; width: 100%"
+      style="bottom:50px; position: absolute; width: 100%"
       v-if="!riddle.last"
       @submit.prevent="postAnswer"
+      elevation-19
     >
       <v-layout align-center justify-space-between>
         <v-text-field
