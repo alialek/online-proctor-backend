@@ -11,25 +11,20 @@
 
     <section class="content">
       <div v-if="riddle.type == 'geo'">
-        <v-btn
-          href="https://net-quest.ru/ar/index.html"
-          color="error"
-          @click="overlay = !overlay"
-        >Show Overlay</v-btn>
+        <v-row justify="center">
+          <v-btn color="primary" dark @click.stop="dialog = true">Open Dialog</v-btn>
 
-        <iframe
-          allow="camera"
-          style="width: 100%; height: 60vh"
-          src="https://net-quest.ru/ar/index.html"
-        ></iframe>
+          <v-dialog v-model="dialog">
+            <iframe
+              allow="camera"
+              style="border: 0; border-radius: 10; width: 100%; height: 60vh"
+              :src="html"
+              :name="name"
+            ></iframe>
+          </v-dialog>
+        </v-row>
       </div>
-      <v-card
-        v-else
-        class="mx-auto task-card grey darken-3"
-        style="margin-bottom: 120px"
-        dark
-        max-width="90%"
-      >
+      <v-card v-else class="mx-auto task-card grey darken-3" style="margin-bottom: 120px" dark>
         <v-card-title>
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
@@ -83,7 +78,9 @@ export default {
       isLoading: false,
       lat: "",
       loaded: false,
-      overlay: false
+      dialog: false,
+      html: "https://net-quest.ru/ar/index.html",
+      name: Date.now()
     };
   },
   methods: {
