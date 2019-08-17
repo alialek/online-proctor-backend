@@ -16,7 +16,9 @@
         <v-btn icon @click="overlay = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-        <div style="width:400px; height; 700px; overflow: hiddent" v-html="html"></div>
+        <iframe style="width: 99vw; height: 60vh">
+          <div style=" overflow: hidden" v-html="html"></div>
+        </iframe>
       </div>
       <v-card
         v-else
