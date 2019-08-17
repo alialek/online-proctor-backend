@@ -31,10 +31,10 @@
     </section>
 
     <v-form
-      style="bottom:50px; position: absolute; width: 100%"
+      style="bottom:40px; position: absolute; width: 100%; background-color: black;border-radius:30px 30px 0px 0px"
       v-if="!riddle.last"
       @submit.prevent="postAnswer"
-      elevation-19
+      class="px-3 pt-2"
     >
       <v-layout align-center justify-space-between>
         <v-text-field
