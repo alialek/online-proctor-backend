@@ -80,7 +80,7 @@ export default {
       loaded: false,
       overlay: false,
       html:
-        "<a-scene embedded arjs>    <a-box position='0 0.5 0' material='opacity: 0.5;'></a-box>    <a-marker-camera preset='hiro'></a-marker-camera>  </a-scene>"
+        "<a-scene arjs='debugUIEnabled: false;'>    <a-box position='0 0.5 0' material='opacity: 0.5;'></a-box>    <a-marker-camera preset='hiro'></a-marker-camera>  </a-scene>"
     };
   },
   methods: {
@@ -176,6 +176,10 @@ export default {
   color: lightgray;
   text-transform: uppercase;
   font-size: 14px;
+}
+.a-canvas {
+  z-index: 999999;
+  overflow: hidden;
 }
 </style>
 
