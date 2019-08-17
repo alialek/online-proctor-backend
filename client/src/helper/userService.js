@@ -1,7 +1,7 @@
 import authHeader from './authHeader';
 import axios from 'axios';
 
-const apiUrl = 'https://netquest-server.herokuapp.com';
+const apiUrl = 'https://net-quest.herokuapp.com';
 
 function login(email, password) {
   const requestOptions = {
