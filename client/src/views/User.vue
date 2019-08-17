@@ -57,7 +57,6 @@ export default {
     registeredSince() {
       let dates = this.registered.split("T")[0].split("-");
       let month = "";
-      console.log(dates[1]);
       switch (dates[1]) {
         case "01":
           month = "января";

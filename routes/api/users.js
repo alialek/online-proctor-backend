@@ -71,7 +71,7 @@ router.post(
         (err, token) => {
           if (err) throw err;
           console.log(newUser);
-          res.json({ token, newUser });
+          res.json({ token, user: newUser });
         }
       );
     } catch (err) {

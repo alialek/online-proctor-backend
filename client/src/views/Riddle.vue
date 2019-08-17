@@ -21,31 +21,33 @@
           v-html="riddle.text"
           class="title text-xs-left task-text"
         ></v-card-text>
-
-        <v-card-actions v-if="!riddle.last" class="align-content-center">
-          <v-form @submit.prevent="postAnswer">
-            <v-layout align-center justify-space-between>
-              <v-text-field
-                v-model="answer"
-                v-if="riddle.required"
-                class="ml-2 mt-3"
-                light
-                solo
-                placeholder="Ответ"
-              ></v-text-field>
-              <v-card-text
-                v-if="!riddle.required"
-                class="headline mb-3 align-right text-xs-right font-weight-bold"
-              >Далее</v-card-text>
-              <v-btn :loading="loading" class="ml-2 mb-3" fab dark color="green darken-1">
-                <v-icon dark>arrow_right</v-icon>
-              </v-btn>
-            </v-layout>
-          </v-form>
-        </v-card-actions>
-        <p v-if="!success">Неправильный ответ</p>
+        <v-card-text>{{lat}}</v-card-text>
       </v-card>
     </section>
+
+    <v-form
+      style="bottom:60px; position: absolute; width: 100%"
+      v-if="!riddle.last"
+      @submit.prevent="postAnswer"
+    >
+      <v-layout align-center justify-space-between>
+        <v-text-field
+          v-model="answer"
+          v-if="riddle.required"
+          class="ml-2 mt-3"
+          light
+          solo
+          placeholder="Ответ"
+        ></v-text-field>
+        <v-card-text
+          v-if="!riddle.required"
+          class="headline mb-3 align-right text-xs-right font-weight-bold"
+        >Далее</v-card-text>
+        <v-btn :loading="loading" class="ml-2 mb-3" fab dark color="green darken-1">
+          <v-icon dark>arrow_right</v-icon>
+        </v-btn>
+      </v-layout>
+    </v-form>
   </section>
 </template>
 
@@ -57,7 +59,9 @@ export default {
   data() {
     return {
       answer: "",
-      isLoading: false
+      isLoading: false,
+      lat: "",
+      lng: ""
     };
   },
   methods: {
@@ -84,9 +88,11 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
-
-    this.$getLocation({ enableHighAccuracy: true }).then(coordinates => {
-      alert(coordinates);
+  },
+  created() {
+    this.$watchLocation({ enableHighAccuracy: true }).then(coordinates => {
+      this.lat = coordinates.lat;
+      this.lng = coordinates.lng;
     });
   },
   watch: {
