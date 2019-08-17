@@ -3,9 +3,14 @@
     <div class="header">
       <v-layout justify-space-between align-center>
         <div class="header__name">Профиль</div>
-        <v-btn fab small flat>
-          <v-icon color="white" text="edit">edit</v-icon>
-        </v-btn>
+        <v-layout justify-end>
+          <v-btn fab small flat>
+            <v-icon color="white" text="edit">edit</v-icon>
+          </v-btn>
+          <v-btn @click="logout()" fab small flat>
+            <v-icon color="white">exit_to_app</v-icon>
+          </v-btn>
+        </v-layout>
       </v-layout>
       <v-card ripple elevation="24" color="white darken-2" class style="border-radius: 5px;">
         <v-layout>
@@ -104,6 +109,10 @@ export default {
       this.name = name;
       this.email = email;
       this.registered = date;
+    },
+    logout() {
+      localStorage.removeItem("user");
+      this.$router.push("/login");
     }
   },
   created() {

@@ -32,7 +32,7 @@ a {
 @media (min-width: 600px) {
   .application {
     width: 480px;
-    height: 720px;
+    height: 100%;
     margin-left: 50%;
     transform: translateX(-50%);
   }

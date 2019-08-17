@@ -60,6 +60,7 @@ router.post(
           id: user.id
         }
       };
+      let newUser = await User.findOne({ email });
 
       jwt.sign(
         payload,
@@ -69,8 +70,7 @@ router.post(
         },
         (err, token) => {
           if (err) throw err;
-          res.json(token);
-          console.log(token);
+          res.json(token, newUser);
         }
       );
     } catch (err) {

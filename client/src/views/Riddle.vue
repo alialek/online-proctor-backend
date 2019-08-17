@@ -84,19 +84,9 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
-    navigator.permissions.query({ name: "geolocation" }).then(function(result) {
-      if (result.state == "granted") {
-        this.$getLocation({ enableHighAccuracy: true }).then(coordinates => {
-          alert(coordinates);
-        });
-      } else if (result.state == "prompt") {
-        alert("Rtr");
-      } else if (result.state == "denied") {
-        alert("Oops");
-      }
-      result.onchange = function() {
-        alert(result.state);
-      };
+
+    this.$getLocation({ enableHighAccuracy: true }).then(coordinates => {
+      alert(coordinates);
     });
   },
   watch: {

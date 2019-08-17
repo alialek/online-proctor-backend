@@ -96,6 +96,12 @@ export default {
         dispatch("authentication/register", { name, email, password });
       }
     }
+  },
+  beforeUpdate() {
+    let user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      this.router.push("/");
+    }
   }
 };
 </script>
