@@ -10,7 +10,16 @@
     </v-toolbar>
 
     <section class="content">
+      <div v-if="riddle.type == 'geo'">
+        <v-btn color="error" @click="overlay = !overlay">Show Overlay</v-btn>
+
+        <v-btn icon @click="overlay = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <div style="width:400px; height; 700px; overflow: hiddent" v-html="html"></div>
+      </div>
       <v-card
+        v-else
         class="mx-auto task-card grey darken-3"
         style="margin-bottom: 120px"
         dark
@@ -68,8 +77,10 @@ export default {
       answer: "",
       isLoading: false,
       lat: "",
-      lng: "",
-      interval: ""
+      loaded: false,
+      overlay: false,
+      html:
+        "<a-scene embedded arjs>    <a-box position='0 0.5 0' material='opacity: 0.5;'></a-box>    <a-marker-camera preset='hiro'></a-marker-camera>  </a-scene>"
     };
   },
   methods: {
@@ -97,9 +108,26 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
+    this.$loadScript("https://aframe.io/releases/0.9.2/aframe.min.js")
+      .then(() => {
+        this.loaded = true;
+      })
+      .catch(() => {
+        this.loaded = false;
+      });
+
+    this.$loadScript(
+      "https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.7/aframe/build/aframe-ar.js"
+    )
+      .then(() => {
+        this.loaded = true;
+      })
+      .catch(err => {
+        this.loaded = false;
+      });
   },
   beforeDestroy() {
-    clearInterval(this.interval);
+    this.riddle.text = "Загрузка";
   },
   mounted() {
     navigator.geolocation.watchPosition(position => {

@@ -23,7 +23,13 @@ const userQuestSchema = new mongoose.Schema({
   id: {
     type: Number
   },
-  riddles: [userRiddleSchema]
+  riddles: [userRiddleSchema],
+  amount: {
+    type: Number
+  },
+  solvedRiddles: {
+    type: Number
+  }
 });
 
 const UserSchema = new mongoose.Schema({

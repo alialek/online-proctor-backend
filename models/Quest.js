@@ -10,7 +10,15 @@ const RiddleSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['гео', 'один', 'много', 'открытый', 'текст', 'интерактив']
+    enum: [
+      'geo',
+      'single',
+      'several',
+      'several-geo',
+      'text',
+      'interactive',
+      'ar'
+    ]
   },
   text: {
     type: String
@@ -23,6 +31,41 @@ const RiddleSchema = new mongoose.Schema({
   },
   location: {
     type: String
+  },
+  last: {
+    type: Boolean
+  },
+  children: {
+    num: {
+      type: Number
+    },
+    title: {
+      type: String
+    },
+    type: {
+      type: String,
+      enum: [
+        'geo',
+        'single',
+        'several',
+        'several-geo',
+        'text',
+        'interactive',
+        'ar'
+      ]
+    },
+    text: {
+      type: String
+    },
+    answer: {
+      type: String
+    },
+    required: {
+      type: Boolean
+    },
+    location: {
+      type: String
+    }
   }
 });
 
