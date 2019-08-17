@@ -23,7 +23,7 @@
         ></v-card-text>
 
         <v-card-actions v-if="!riddle.last" class="align-content-center">
-          <v-form @submit.prevent="geoInfo">
+          <v-form @submit.prevent="postAnswer">
             <v-layout align-center justify-space-between>
               <v-text-field
                 v-model="answer"
@@ -61,32 +61,6 @@ export default {
     };
   },
   methods: {
-    geoInfo() {
-      navigator.permissions
-        .query({ name: "geolocation" })
-        .then(function(result) {
-          if (result.state == "granted") {
-            this.$getLocation({ enableHighAccuracy: true }).then(
-              coordinates => {
-                alert(coordinates);
-              }
-            );
-          } else if (result.state == "prompt") {
-            alert(
-              navigator.geolocation.getCurrentPosition(
-                revealPosition,
-                positionDenied,
-                geoSettings
-              )
-            );
-          } else if (result.state == "denied") {
-            alert("Oops");
-          }
-          result.onchange = function() {
-            alert(result.state);
-          };
-        });
-    },
     postAnswer() {
       this.isLoading = true;
       this.$store.dispatch("quest/postAnswer", {
@@ -110,7 +84,20 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
-    this.geoInfo;
+    navigator.permissions.query({ name: "geolocation" }).then(function(result) {
+      if (result.state == "granted") {
+        this.$getLocation({ enableHighAccuracy: true }).then(coordinates => {
+          alert(coordinates);
+        });
+      } else if (result.state == "prompt") {
+        alert("Rtr");
+      } else if (result.state == "denied") {
+        alert("Oops");
+      }
+      result.onchange = function() {
+        alert(result.state);
+      };
+    });
   },
   watch: {
     $route() {
