@@ -62,9 +62,30 @@ export default {
   },
   methods: {
     geoInfo() {
-      this.$getLocation({ enableHighAccuracy: true }).then(coordinates => {
-        console.log(coordinates);
-      });
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then(function(result) {
+          if (result.state == "granted") {
+            this.$getLocation({ enableHighAccuracy: true }).then(
+              coordinates => {
+                alert(coordinates);
+              }
+            );
+          } else if (result.state == "prompt") {
+            alert(
+              navigator.geolocation.getCurrentPosition(
+                revealPosition,
+                positionDenied,
+                geoSettings
+              )
+            );
+          } else if (result.state == "denied") {
+            alert("Oops");
+          }
+          result.onchange = function() {
+            alert(result.state);
+          };
+        });
     },
     postAnswer() {
       this.isLoading = true;
