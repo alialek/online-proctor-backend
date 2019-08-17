@@ -26,7 +26,7 @@
           v-html="riddle.text"
           class="title text-xs-left task-text"
         ></v-card-text>
-        <v-card-text>{{lat}}</v-card-text>
+        <v-card-text>До цели: {{lat}}м.</v-card-text>
       </v-card>
     </section>
 
@@ -59,6 +59,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
+import { getDistance } from "geolib";
 export default {
   name: "Riddle",
   components: {},
@@ -67,7 +68,8 @@ export default {
       answer: "",
       isLoading: false,
       lat: "",
-      lng: ""
+      lng: "",
+      interval: ""
     };
   },
   methods: {
@@ -79,6 +81,17 @@ export default {
         riddleID: this.$route.params.riddle_id
       });
       this.isLoading = false;
+    },
+    getDistance() {
+      navigator.geolocation.getCurrentPosition(position => {
+        this.lat = getDistance(
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          },
+          { latitude: 59.719325, longitude: 30.4085556 }
+        );
+      });
     }
   },
   computed: {
@@ -95,11 +108,11 @@ export default {
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
   },
-  created() {
-    this.$watchLocation({ enableHighAccuracy: true }).then(coordinates => {
-      this.lat = coordinates.lat;
-      this.lng = coordinates.lng;
-    });
+  beforeDestroy() {
+    clearInterval(this.interval);
+  },
+  mounted() {
+    this.interval = setInterval(() => this.getDistance(), 1000);
   },
   watch: {
     $route() {
