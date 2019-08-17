@@ -11,14 +11,13 @@
 
     <section class="content">
       <div v-if="riddle.type == 'geo'">
-        <v-btn color="error" @click="overlay = !overlay">Show Overlay</v-btn>
+        <v-btn
+          href="https://net-quest.ru/ar/index.html"
+          color="error"
+          @click="overlay = !overlay"
+        >Show Overlay</v-btn>
 
-        <v-btn icon @click="overlay = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <iframe style="width: 99vw; height: 60vh">
-          <div style=" overflow: hidden" v-html="html"></div>
-        </iframe>
+        <iframe style="width: 100%; height: 60vh" src="https://net-quest.ru/ar/index.html"></iframe>
       </div>
       <v-card
         v-else
@@ -42,7 +41,7 @@
     </section>
 
     <v-form
-      style="bottom:40px; position: absolute; width: 100%; background-color: black;border-radius:30px 30px 0px 0px"
+      style="bottom:40px; position: fixed; width: 100%; background-color: black;border-radius:30px 30px 0px 0px"
       v-if="!riddle.last"
       @submit.prevent="postAnswer"
       class="px-3 pt-2"
@@ -80,9 +79,7 @@ export default {
       isLoading: false,
       lat: "",
       loaded: false,
-      overlay: false,
-      html:
-        "<a-scene arjs='debugUIEnabled: false;'>    <a-box position='0 0.5 0' material='opacity: 0.5;'></a-box>    <a-marker-camera preset='hiro'></a-marker-camera>  </a-scene>"
+      overlay: false
     };
   },
   methods: {
