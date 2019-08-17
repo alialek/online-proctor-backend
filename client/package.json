@@ -5,10 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "dev": "vue-cli-service cordova-serve",
-    "prod": "vue-cli-service cordova-production",
-    "release": "vue-cli-service cordova-release"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -32,7 +29,6 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "vue-cli-plugin-vuetify": "^0.5.0",
-    "vue-cli-plugin-vuetify-cordova": "0.0.13",
     "vue-template-compiler": "^2.6.10",
     "vuetify-loader": "^1.0.5",
     "xml2js": "^0.4.19"
@@ -60,19 +56,5 @@
     "> 1%",
     "last 2 versions"
   ],
-  "cordova": {
-    "plugins": {
-      "cordova-plugin-device": {},
-      "cordova-plugin-ionic-webview": {},
-      "cordova-plugin-splashscreen": {},
-      "cordova-plugin-statusbar": {},
-      "cordova-plugin-whitelist": {}
-    },
-    "platforms": [
-      "android",
-      "browser",
-      "ios"
-    ]
-  },
   "proxy": "http://localhost:8938"
 }
