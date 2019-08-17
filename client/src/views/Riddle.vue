@@ -82,17 +82,7 @@ export default {
       });
       this.isLoading = false;
     },
-    getDistance() {
-      navigator.geolocation.getCurrentPosition(position => {
-        this.lat = getDistance(
-          {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          },
-          { latitude: 59.719325, longitude: 30.4085556 }
-        );
-      });
-    }
+    getDistance() {}
   },
   computed: {
     ...mapGetters({
@@ -112,7 +102,15 @@ export default {
     clearInterval(this.interval);
   },
   mounted() {
-    this.interval = setInterval(() => this.getDistance(), 1000);
+    navigator.geolocation.watchPosition(position => {
+      this.lat = getDistance(
+        {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        },
+        { latitude: 59.719325, longitude: 30.4085556 }
+      );
+    });
   },
   watch: {
     $route() {
