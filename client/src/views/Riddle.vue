@@ -107,6 +107,20 @@ export default {
     }
   },
   beforeCreate() {
+    var constraints = {
+      audio: false,
+      video: { facingMode: { exact: "environment" } }
+    };
+
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(function(mediaStream) {
+        alert("success");
+      })
+      .catch(function(err) {
+        alert(err.name + ": " + err.message);
+      });
+
     this.$store.dispatch("quest/getRiddle", this.$route.params);
     this.$loadScript("https://aframe.io/releases/0.9.2/aframe.min.js")
       .then(() => {

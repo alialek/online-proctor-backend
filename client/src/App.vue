@@ -21,22 +21,6 @@ export default {
     isLoading() {
       return this.$store.state.quest.isLoading;
     }
-  },
-
-  beforeCreate() {
-    var constraints = {
-      audio: false,
-      video: { facingMode: { exact: "environment" } }
-    };
-
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function(mediaStream) {
-        alert("success");
-      })
-      .catch(function(err) {
-        alert(err.name + ": " + err.message);
-      });
   }
 };
 </script>
