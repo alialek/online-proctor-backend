@@ -57,7 +57,7 @@ router.get('/:id_quest/:id_riddle', auth, async (req, res) => {
 
   let userID = req.user.id;
   let user = await User.findOne({ _id: userID }).select('quests');
-  let userRiddles = user.quests.filter(quest => quest.id === id_quest)[0];
+  let userRiddles = user.quests.filter(quest => quest.id === id_quest);
   try {
     let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
     let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
