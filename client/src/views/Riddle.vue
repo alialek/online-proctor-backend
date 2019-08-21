@@ -114,12 +114,8 @@ export default {
 
     navigator.mediaDevices
       .getUserMedia(constraints)
-      .then(function(mediaStream) {
-        alert("success");
-      })
-      .catch(function(err) {
-        alert(err.name + ": " + err.message);
-      });
+      .then(function(mediaStream) {})
+      .catch(function(err) {});
 
     this.$store.dispatch("quest/getRiddle", this.$route.params);
     this.$loadScript("https://aframe.io/releases/0.9.2/aframe.min.js")

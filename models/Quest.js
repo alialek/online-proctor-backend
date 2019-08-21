@@ -27,46 +27,21 @@ const RiddleSchema = new mongoose.Schema({
     type: String
   },
   required: {
-    type: Boolean
+    type: Boolean //обязательно ли выполнение
   },
   location: {
-    type: String
+    type: Array //Ширина и долгота
   },
   last: {
-    type: Boolean
+    type: Boolean //Если это последняя загадка, то кнопка далее не выводится
   },
-  children: {
-    num: {
-      type: Number
-    },
-    title: {
-      type: String
-    },
-    type: {
-      type: String,
-      enum: [
-        'geo',
-        'single',
-        'several',
-        'several-geo',
-        'text',
-        'interactive',
-        'ar'
-      ]
-    },
-    text: {
-      type: String
-    },
-    answer: {
-      type: String
-    },
-    required: {
-      type: Boolean
-    },
-    location: {
-      type: String
-    }
-  }
+  backToNum: {
+    type: Number //Ссылка для возвращения назад, нужно для комнат
+  },
+  nextNum: {
+    type: Number //Ссылка кнопки далее
+  },
+  requires: Array //Какие загадки нужно решить, чтобы получить доступ
 });
 
 const QuestSchema = new mongoose.Schema({

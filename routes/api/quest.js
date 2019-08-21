@@ -54,21 +54,36 @@ router.get('/:id_quest/:id_riddle', auth, async (req, res) => {
   let id_quest = parseInt(req.params.id_quest);
   let id_riddle = parseInt(req.params.id_riddle);
   //Получаем количество решенных загадок у пользователя в данном квесте
+
   let userID = req.user.id;
   let user = await User.findOne({ _id: userID }).select('quests');
   let userRiddles = user.quests.filter(quest => quest.id === id_quest)[0];
   try {
-    /*
-    id Загадки - это ее номер по порядку. Если длина массива меньше  или равна номеру загадки, то пользователь может посмотреть ее условие, если запрошенный номер больше доступных пользователю, то возникает ошибка 
-    */
-    if (userRiddles.riddles.length >= id_riddle) {
-      let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
-      let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
+    let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
+    let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
 
+    //Перебор по решенным загадкам пользователя, собираем ID в массив
+    let solved = userRiddles.map(riddle => {
+      return riddle.num;
+    });
+
+    //Проверим, может, загадка уже решена, тогда принимаем любой ответ
+    let alreadyAnswered = solved.filter(x => x == id_riddle);
+
+    //Функция для сравнения, есть ли в solved все ID из riddle.requires
+    let intersection = riddle.requires.filter(x => solved.includes(x));
+
+    if (alreadyAnswered.length !== 0) {
+      res.json(riddle);
+    } else if (intersection.length == riddle.requires.length) {
       res.json(riddle);
     } else {
       res.json('Тебе сюда нельзя (пока что)');
     }
+
+    /*
+    id Загадки - это ее номер по порядку. Если длина массива меньше  или равна номеру загадки, то пользователь может посмотреть ее условие, если запрошенный номер больше доступных пользователю, то возникает ошибка 
+    */
   } catch (err) {
     console.error(err.message);
     res.status(500).json('Проблема на сервере');
@@ -161,20 +176,33 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
   let riddleIsRequired = riddle[0].required;
 
-  if (userRiddles[0].riddles.length > id_riddle) {
+  let solved = userRiddles.map(riddle => {
+    return riddle.num;
+  });
+
+  //Проверим, может, загадка уже решена, тогда принимаем любой ответ
+  let alreadyAnswered = solved.filter(x => x == id_riddle);
+
+  //Функция для сравнения, есть ли в solved все ID из riddle.requires
+  let intersection = riddle.requires.filter(x => solved.includes(x));
+  //Уже отвечено?
+  if (alreadyAnswered.length !== 0) {
     return res.json({ success: true });
   } else {
     if (riddleIsRequired) {
       let userAnswer = req.body.answer;
-      if (!isNaN(userAnswer)) {
+      if (typeof userAnswer === 'string') {
         userAnswer = userAnswer.toLowerCase();
       }
       try {
         let riddleAnswer = riddle[0].answer;
 
-        if (riddleAnswer == userAnswer) {
+        if (
+          riddleAnswer == userAnswer &&
+          intersection.length == riddle.requires.length
+        ) {
           riddle = {
-            id: id_riddle + 1
+            id: riddle[0].nextNum
           };
           User.updateOne(
             { _id: userID, 'quests.id': id_quest },
@@ -193,7 +221,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
     } else {
       try {
         riddle = {
-          id: id_riddle + 1
+          id: riddle[0].nextNum
         };
         User.updateOne(
           { _id: userID, 'quests.id': id_quest },
