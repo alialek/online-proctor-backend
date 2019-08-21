@@ -168,9 +168,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   //Получаем количество решенных загадок у пользователя в данном квесте
   let userID = req.user.id;
   let user = await User.findOne({ _id: userID });
-  let userRiddles = user.quests.filter(
-    quest => parseInt(quest.id) + 1 === parseInt(id_quest) + 1
-  );
+  let userRiddles = user.quests.filter(quest => quest.id === id_quest);
 
   let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
   let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle);
