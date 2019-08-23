@@ -189,7 +189,10 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
       }
       try {
         let riddleAnswer = riddle.answer;
-
+        if (typeof riddleAnswer === 'string') {
+          riddleAnswer = riddleAnswer.toLowerCase();
+        }
+        console.log(intersection.length, riddle.requires.length);
         if (
           riddleAnswer == userAnswer &&
           intersection.length == riddle.requires.length
