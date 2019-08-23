@@ -134,7 +134,6 @@ router.post('/', auth, async (req, res) => {
 router.post('/:id', auth, async (req, res) => {
   try {
     let id = parseInt(req.params.id);
-    let quest = await Quest.findOne({ _id: id }).select('riddles');
 
     let userID = req.user.id;
     let user = await User.findOne({ _id: userID });
@@ -143,7 +142,7 @@ router.post('/:id', auth, async (req, res) => {
       id: id,
       riddles: [
         {
-          id: quest.riddles[0].num
+          id: 0
         }
       ]
     };
@@ -159,7 +158,7 @@ router.post('/:id', auth, async (req, res) => {
 //@route   POST api/quest/:id_quest/:id_riddle
 //@desc    POST an answer
 //@access  Private
-//@todo    Запилить проверку уровня, чтобы пользователь не мог отправлять post, если не решил загадку ранее
+//@todo    Запилить проверку уровня, чтобы пользователь не мог отправлять post, если не решил загадку ранее DONE
 
 router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let id_quest = parseInt(req.params.id_quest);
@@ -199,7 +198,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
           intersection.length == riddle.requires.length
         ) {
           riddle = {
-            id: riddle[0].num
+            id: riddle.num
           };
           User.updateOne(
             { _id: userID, 'quests.id': id_quest },
@@ -216,9 +215,10 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
         res.status(500).json('Проблема на сервере');
       }
     } else {
+      console.log('notRequired');
       try {
         riddle = {
-          id: riddle[0].nextNum
+          id: riddle.num
         };
         User.updateOne(
           { _id: userID, 'quests.id': id_quest },

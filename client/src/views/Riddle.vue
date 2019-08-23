@@ -10,21 +10,26 @@
     </v-toolbar>
 
     <section class="content">
-      <div v-if="riddle.type == 'geo'">
+      <div v-if="riddle.type == 'ar'">
         <v-row justify="center">
-          <v-btn color="primary" dark @click.stop="dialog = true">Open Dialog</v-btn>
+          <v-btn color="primary" dark @click.stop="dialog = true">Открыть камеру</v-btn>
 
           <v-dialog v-model="dialog">
             <iframe
               allow="camera"
               style="border: 0; border-radius: 10; width: 100%; height: 60vh"
-              :src="html"
+              :src="riddle.html"
               :name="name"
             ></iframe>
           </v-dialog>
         </v-row>
       </div>
-      <v-card v-else class="mx-auto task-card grey darken-3" style="margin-bottom: 120px" dark>
+      <v-card
+        v-if="riddle.type == 'geo'"
+        class="mx-auto task-card grey darken-3"
+        style="margin-bottom: 120px"
+        dark
+      >
         <v-card-title>
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
@@ -37,19 +42,36 @@
         ></v-card-text>
         <v-card-text>До цели: {{lat}}м.</v-card-text>
       </v-card>
+      <v-card
+        v-if="riddle.type == 'text'"
+        class="mx-auto task-card grey darken-3"
+        style="margin-bottom: 120px"
+        dark
+      >
+        <v-card-title>
+          <v-icon medium left>extension</v-icon>
+          <span class="title font-weight-light">Задание #{{riddle.num}}</span>
+        </v-card-title>
+
+        <v-card-text
+          style="line-height: 1.2em"
+          v-html="riddle.text"
+          class="regular text-xs-left task-text"
+        ></v-card-text>
+      </v-card>
     </section>
 
     <v-form
       style="bottom:40px; position: fixed; width: 100%; background-color: black;border-radius:30px 30px 0px 0px"
       v-if="!riddle.last"
       @submit.prevent="postAnswer"
-      class="px-3 pt-2"
+      class="px-3 pt-1"
     >
       <v-layout align-center justify-space-between>
         <v-text-field
           v-model="answer"
           v-if="riddle.required"
-          class="ml-2 mt-3"
+          class="ml-2 mt-2"
           light
           solo
           placeholder="Ответ"
@@ -58,7 +80,14 @@
           v-if="!riddle.required"
           class="headline mb-3 align-right text-xs-right font-weight-bold"
         >Далее</v-card-text>
-        <v-btn :loading="loading" class="ml-2 mb-3" fab dark color="green darken-1">
+        <v-btn
+          @click="postAnswer"
+          :loading="loading"
+          class="ml-2 mb-3"
+          fab
+          dark
+          color="green darken-1"
+        >
           <v-icon dark>arrow_right</v-icon>
         </v-btn>
       </v-layout>
@@ -96,8 +125,8 @@ export default {
     getDistance() {}
   },
   computed: {
-    ...mapGetters({
-      riddle: "quest/riddle"
+    ...mapState("quest", {
+      riddle: state => state.riddle
     }),
     ...mapState("quest", {
       loading: state => state.loading
@@ -168,19 +197,19 @@ export default {
 }
 
 .task-card {
-  max-height: 70%;
+  max-height: calc(100vh - 120px);
 }
 
 .task-text {
   max-height: 60vh;
+  font-size: 1.2em;
   overflow-y: scroll;
-  line-height: 1.2em !important;
+  line-height: 1.6em !important;
 }
 
 .content {
-  margin-top: 70px;
+  margin-top: 60px;
   overflow-y: hidden;
-  margin-bottom: 60px;
 }
 .content__subheader {
   color: lightgray;
