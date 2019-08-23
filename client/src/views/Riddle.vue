@@ -1,7 +1,7 @@
 <template dark>
   <section class="riddle">
     <v-toolbar fixed style="background-size: cover; background-color: rgba(0,0,0,1); " dark>
-      <router-link to="/events">
+      <router-link :to="String(riddle.backToNum)">
         <v-toolbar-side-icon>
           <v-icon>arrow_back</v-icon>
         </v-toolbar-side-icon>
@@ -76,10 +76,11 @@
           solo
           placeholder="Ответ"
         ></v-text-field>
-        <v-card-text
+        <p
           v-if="!riddle.required"
-          class="headline mb-3 align-right text-xs-right font-weight-bold"
-        >Далее</v-card-text>
+          style="color:white; text-align: "
+          class="headline mb-3 text-xs-right font-weight-bold"
+        >Далее</p>
         <v-btn
           @click="postAnswer"
           :loading="loading"

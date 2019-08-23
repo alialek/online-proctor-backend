@@ -191,7 +191,7 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
         userAnswer = userAnswer.toLowerCase();
       }
       try {
-        let riddleAnswer = riddle[0].answer;
+        let riddleAnswer = riddle.answer;
 
         if (
           riddleAnswer == userAnswer &&
