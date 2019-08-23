@@ -79,11 +79,13 @@ export const quest = {
       context.commit('setLoading');
       let questID = params.questID;
       let riddleID = params.riddleID;
+      console.log(riddleID);
       let answer = params.answer;
+      let nextNum = params.nextNum;
       try {
         questService.postAnswer(questID, riddleID, answer).then(data => {
           data.json().then(res => {
-            context.commit('setIsSucceed', res);
+            context.commit('setIsSucceed', { res, nextNum });
           });
         });
       } catch (error) {
@@ -107,14 +109,14 @@ export const quest = {
       state.riddle = res;
       state.loading = false;
     },
-    setIsSucceed(state, res) {
-      if (res.success) {
+    setIsSucceed(state, params) {
+      if (params.res.success) {
         this.state.success = true;
         router.push(
           '/quest/' +
             router.currentRoute.params.id +
             '/riddle/' +
-            (parseInt(router.currentRoute.params.riddle_id) + 1)
+            params.nextNum
         );
       } else {
         this.state.success = false;

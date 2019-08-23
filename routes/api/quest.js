@@ -171,14 +171,11 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
   let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
   let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle)[0];
   let riddleIsRequired = riddle.required;
-
-  let solved = userRiddles.map(riddle => {
-    return riddle.num;
+  let solved = userRiddles[0].riddles.map(riddle => {
+    return riddle.id;
   });
-
   //Проверим, может, загадка уже решена, тогда принимаем любой ответ
   let alreadyAnswered = solved.filter(x => x == id_riddle);
-
   //Функция для сравнения, есть ли в solved все ID из riddle.requires
   let intersection = riddle.requires.filter(x => solved.includes(x));
   //Уже отвечено?
@@ -202,7 +199,12 @@ router.post('/:id_quest/:id_riddle', auth, async (req, res) => {
           };
           User.updateOne(
             { _id: userID, 'quests.id': id_quest },
-            { $push: { 'quests.$.riddles': riddle } },
+            {
+              $push: {
+                'quests.$.riddles': riddle,
+                'quests.$.lastAnswer': userAnswer
+              }
+            },
             function(err, docs) {
               res.json({ success: true });
             }

@@ -82,7 +82,7 @@
           class="headline mb-3 text-xs-right font-weight-bold"
         >Далее</p>
         <v-btn
-          @click="postAnswer"
+          @click="postAnswer(riddle.nextNum)"
           :loading="loading"
           class="ml-2 mb-3"
           fab
@@ -114,12 +114,13 @@ export default {
     };
   },
   methods: {
-    postAnswer() {
+    postAnswer(nextNum) {
       this.isLoading = true;
       this.$store.dispatch("quest/postAnswer", {
         answer: this.answer,
         questID: this.$route.params.id,
-        riddleID: this.$route.params.riddle_id
+        riddleID: this.$route.params.riddle_id,
+        nextNum
       });
       this.isLoading = false;
     },
