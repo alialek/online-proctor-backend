@@ -11,18 +11,30 @@
 
     <section class="content">
       <div v-if="riddle.type == 'ar'">
-        <v-row justify="center">
-          <v-btn color="primary" dark @click.stop="startAR">Открыть камеру</v-btn>
-
-          <v-dialog v-model="dialog">
-            <iframe
-              allow="camera"
-              style="border: 0; border-radius: 10; width: 100%; height: 60vh"
-              :src="riddle.location[0]"
-              :name="name"
-            ></iframe>
-          </v-dialog>
-        </v-row>
+        <v-dialog v-model="dialog">
+          <iframe
+            allow="camera"
+            style=" border: 0; border-radius: 10; width: 100%; height: 60vh"
+            :src="riddle.location[0]"
+            :name="name"
+          ></iframe>
+        </v-dialog>
+        <v-card class="mx-auto task-card grey darken-3" style="margin-bottom: 120px" dark>
+          <v-card-title>
+            <v-icon medium left>mdi-cube-scan</v-icon>
+            <span class="title font-weight-light">Дополненная реальность</span>
+          </v-card-title>
+          <v-card-text>
+            <p class="regular">Не забудьте разрешить приложению доступ к камере</p>
+            <v-layout justify-center>
+              <v-btn color="primary" large dark @click.stop="startAR">
+                Открыть камеру
+                <v-icon right>mdi-augmented-reality</v-icon>
+              </v-btn>
+            </v-layout>
+          </v-card-text>
+          <v-card-text v-if="arHidden">{{riddle.text}}</v-card-text>
+        </v-card>
       </div>
       <v-card
         v-if="riddle.type == 'geo'"
@@ -41,10 +53,16 @@
           v-html="riddle.text"
           class="title text-xs-left task-text"
         ></v-card-text>
-        <v-card-text
-          v-if="dist == 999999"
-        >Ой, кажется, вы забыли включить GPS, либо разрешить приложению доступ в настройках. Исправьте и возвращайтесь сюда!</v-card-text>
-        <v-card-text v-if="dist > 5">До цели: {{dist}}м.</v-card-text>
+
+        <v-alert dense border="left" value="dist > 5" type="warning" class="mx-2">
+          Информация станет доступна, как только Ваше расстояние станет меньше 5 метров
+          <p v-if="dist == 999999">
+            <br />Ой, кажется, вы забыли включить GPS, либо разрешить приложению доступ в настройках. Исправьте и возвращайтесь сюда!
+          </p>
+        </v-alert>
+
+        <v-icon text="mdi-geolocation">mdi-geolocation</v-icon>
+        <v-card-text class="title mb-2" v-if="dist > 5">До цели: {{dist}}м.</v-card-text>
       </v-card>
       <v-card
         v-if="riddle.type == 'text'"
@@ -88,7 +106,7 @@
         <v-btn
           @click="postAnswer(riddle.nextNum)"
           :loading="loading"
-          :disabled="dist > 5"
+          :disabled="riddle.type == 'geo' && dist > 5"
           class="ml-2 mb-3"
           fab
           dark
@@ -102,7 +120,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 import { getDistance } from "geolib";
 export default {
   name: "Riddle",
@@ -114,6 +132,7 @@ export default {
       dist: 999999,
       loaded: false,
       dialog: false,
+      arHidden: false,
       name: Date.now()
     };
   },
@@ -123,6 +142,7 @@ export default {
   methods: {
     startAR() {
       this.dialog = true;
+      this.arHidden = true;
       var constraints = {
         audio: false,
         video: { facingMode: { exact: "environment" } }

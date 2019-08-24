@@ -80,9 +80,10 @@ export const quest = {
       context.commit('setLoading');
       let questID = params.questID;
       let riddleID = params.riddleID;
-      console.log(riddleID);
       let answer = params.answer;
       let nextNum = params.nextNum;
+
+      console.log(nextNum);
       try {
         questService.postAnswer(questID, riddleID, answer).then(data => {
           data.json().then(res => {
