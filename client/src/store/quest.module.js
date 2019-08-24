@@ -65,6 +65,7 @@ export const quest = {
     },
     getRiddle(context, params) {
       context.commit('setLoading');
+      console.log(params);
       let questID = params.id;
       let riddleID = params.riddle_id;
       try {

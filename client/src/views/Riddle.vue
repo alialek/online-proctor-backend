@@ -12,13 +12,13 @@
     <section class="content">
       <div v-if="riddle.type == 'ar'">
         <v-row justify="center">
-          <v-btn color="primary" dark @click.stop="dialog = true">Открыть камеру</v-btn>
+          <v-btn color="primary" dark @click.stop="startAR">Открыть камеру</v-btn>
 
           <v-dialog v-model="dialog">
             <iframe
               allow="camera"
               style="border: 0; border-radius: 10; width: 100%; height: 60vh"
-              :src="riddle.html"
+              :src="riddle.location[0]"
               :name="name"
             ></iframe>
           </v-dialog>
@@ -37,10 +37,14 @@
 
         <v-card-text
           style="line-height: 1.2em"
+          v-if="dist <= 5"
           v-html="riddle.text"
           class="title text-xs-left task-text"
         ></v-card-text>
-        <v-card-text>До цели: {{lat}}м.</v-card-text>
+        <v-card-text
+          v-if="dist == 999999"
+        >Ой, кажется, вы забыли включить GPS, либо разрешить приложению доступ в настройках. Исправьте и возвращайтесь сюда!</v-card-text>
+        <v-card-text v-if="dist > 5">До цели: {{dist}}м.</v-card-text>
       </v-card>
       <v-card
         v-if="riddle.type == 'text'"
@@ -84,6 +88,7 @@
         <v-btn
           @click="postAnswer(riddle.nextNum)"
           :loading="loading"
+          :disabled="dist > 5"
           class="ml-2 mb-3"
           fab
           dark
@@ -106,14 +111,28 @@ export default {
     return {
       answer: "",
       isLoading: false,
-      lat: "",
+      dist: 999999,
       loaded: false,
       dialog: false,
-      html: "https://net-quest.ru/ar/index.html",
       name: Date.now()
     };
   },
+  beforeCreate() {
+    this.$store.dispatch("quest/getRiddle", this.$route.params);
+  },
   methods: {
+    startAR() {
+      this.dialog = true;
+      var constraints = {
+        audio: false,
+        video: { facingMode: { exact: "environment" } }
+      };
+
+      navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then(function(mediaStream) {})
+        .catch(function(err) {});
+    },
     postAnswer(nextNum) {
       this.isLoading = true;
       this.$store.dispatch("quest/postAnswer", {
@@ -137,50 +156,45 @@ export default {
       return this.$store.state.quest.success;
     }
   },
-  beforeCreate() {
-    var constraints = {
-      audio: false,
-      video: { facingMode: { exact: "environment" } }
-    };
+  beforeUpdate() {
+    if (this.riddle.type == "ar") {
+      this.$loadScript("https://aframe.io/releases/0.9.2/aframe.min.js")
+        .then(() => {
+          this.loaded = true;
+        })
+        .catch(() => {
+          this.loaded = false;
+        });
 
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function(mediaStream) {})
-      .catch(function(err) {});
-
-    this.$store.dispatch("quest/getRiddle", this.$route.params);
-    this.$loadScript("https://aframe.io/releases/0.9.2/aframe.min.js")
-      .then(() => {
-        this.loaded = true;
-      })
-      .catch(() => {
-        this.loaded = false;
+      this.$loadScript(
+        "https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.7/aframe/build/aframe-ar.js"
+      )
+        .then(() => {
+          this.loaded = true;
+        })
+        .catch(err => {
+          this.loaded = false;
+        });
+    }
+    if (this.riddle.type == "geo") {
+      navigator.geolocation.watchPosition(position => {
+        this.dist = getDistance(
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          },
+          {
+            latitude: this.riddle.location[0],
+            longitude: this.riddle.location[1]
+          }
+        );
       });
-
-    this.$loadScript(
-      "https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.7/aframe/build/aframe-ar.js"
-    )
-      .then(() => {
-        this.loaded = true;
-      })
-      .catch(err => {
-        this.loaded = false;
-      });
+    }
   },
   beforeDestroy() {
     this.riddle.text = "Загрузка";
   },
-  mounted() {
-    navigator.geolocation.watchPosition(position => {
-      this.lat = getDistance(
-        {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        },
-        { latitude: 59.719325, longitude: 30.4085556 }
-      );
-    });
-  },
+  mounted() {},
   watch: {
     $route() {
       this.$store.dispatch("quest/getRiddle", this.$route.params);
