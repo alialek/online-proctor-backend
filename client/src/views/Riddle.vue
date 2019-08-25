@@ -49,12 +49,12 @@
 
         <v-card-text
           style="line-height: 1.2em"
-          v-if="dist <= 5"
+          v-if="dist <= 20"
           v-html="riddle.text"
           class="title text-xs-left task-text"
         ></v-card-text>
 
-        <v-alert dense border="left" value="dist > 5" type="warning" class="mx-2">
+        <v-alert dense border="left" value="dist > 20" type="warning" class="mx-2">
           Информация станет доступна, как только Ваше расстояние станет меньше 5 метров
           <p v-if="dist == 999999">
             <br />Ой, кажется, вы забыли включить GPS, либо разрешить приложению доступ в настройках. Исправьте и возвращайтесь сюда!
@@ -62,7 +62,7 @@
         </v-alert>
 
         <v-icon text="mdi-geolocation">mdi-geolocation</v-icon>
-        <v-card-text class="title mb-2" v-if="dist > 5">До цели: {{dist}}м.</v-card-text>
+        <v-card-text class="title mb-2" v-if="dist > 20">До цели: {{dist}}м.</v-card-text>
       </v-card>
       <v-card
         v-if="riddle.type == 'text'"
@@ -197,6 +197,11 @@ export default {
         });
     }
     if (this.riddle.type == "geo") {
+      let options = {
+        enableHighAccuracy: true,
+        timeout: 2000,
+        maximumAge: 0
+      };
       navigator.geolocation.watchPosition(position => {
         this.dist = getDistance(
           {
@@ -208,7 +213,7 @@ export default {
             longitude: this.riddle.location[1]
           }
         );
-      });
+      }, options);
     }
   },
   beforeDestroy() {
