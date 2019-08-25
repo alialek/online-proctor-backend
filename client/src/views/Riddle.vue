@@ -202,18 +202,24 @@ export default {
         timeout: 2000,
         maximumAge: 0
       };
-      navigator.geolocation.watchPosition(position => {
-        this.dist = getDistance(
-          {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          },
-          {
-            latitude: this.riddle.location[0],
-            longitude: this.riddle.location[1]
-          }
-        );
-      }, options);
+      navigator.geolocation.watchPosition(
+        position => {
+          this.dist = getDistance(
+            {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            },
+            {
+              latitude: this.riddle.location[0],
+              longitude: this.riddle.location[1]
+            }
+          );
+        },
+        function error(msg) {
+          alert("Please enable your GPS position feature.");
+        },
+        options
+      );
     }
   },
   beforeDestroy() {
