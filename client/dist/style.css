@@ -9,3 +9,7 @@
 .flex-column {
   flex-direction: column;
 }
+
+.a-canvas {
+  position: relative !important;
+}

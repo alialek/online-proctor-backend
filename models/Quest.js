@@ -72,6 +72,9 @@ const QuestSchema = new mongoose.Schema({
   dateStart: {
     type: String
   },
+  dateStartInUTC: {
+    type: Date
+  },
   isActual: {
     type: Boolean
   },
@@ -87,7 +90,10 @@ const QuestSchema = new mongoose.Schema({
   rules: {
     type: String
   },
-  riddles: [RiddleSchema]
+  riddles: [RiddleSchema],
+  registered: {
+    type: Array
+  }
 });
 
 QuestSchema.plugin(MongooseAutoIncrementID.plugin, {

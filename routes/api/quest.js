@@ -56,33 +56,32 @@ router.get('/:id_quest/:id_riddle', auth, async (req, res) => {
   //Получаем количество решенных загадок у пользователя в данном квесте
 
   let userID = req.user.id;
-  let user = await User.findOne({ _id: userID }).select('quests');
+  let user = await User.findOne({ _id: userID });
   let userRiddles = user.quests.filter(quest => quest.id === id_quest);
+  let quest = await Quest.findOne({ _id: id_quest });
 
   try {
-    let quest = await Quest.findOne({ _id: id_quest }).select('riddles');
-    let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle)[0];
+    if (user.isAdmin || Date.now() > quest.dateStartInUTC) {
+      let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle)[0];
+      //Перебор по решенным загадкам пользователя, собираем ID в массив
+      let solved = userRiddles[0].riddles.map(riddle => {
+        return riddle.id;
+      });
+      //Проверим, может, загадка уже решена, тогда принимаем любой ответ
+      let alreadyAnswered = solved.filter(x => x == id_riddle);
+      //Функция для сравнения, есть ли в solved все ID из riddle.requires
+      let intersection = riddle.requires.filter(x => solved.includes(x));
 
-    //Перебор по решенным загадкам пользователя, собираем ID в массив
-    let solved = userRiddles[0].riddles.map(riddle => {
-      return riddle.id;
-    });
-    //Проверим, может, загадка уже решена, тогда принимаем любой ответ
-    let alreadyAnswered = solved.filter(x => x == id_riddle);
-    //Функция для сравнения, есть ли в solved все ID из riddle.requires
-    let intersection = riddle.requires.filter(x => solved.includes(x));
-
-    if (alreadyAnswered.length !== 0) {
-      res.json(riddle);
-    } else if (intersection.length == riddle.requires.length) {
-      res.json(riddle);
+      if (alreadyAnswered.length !== 0) {
+        res.json(riddle);
+      } else if (intersection.length == riddle.requires.length) {
+        res.json(riddle);
+      } else {
+        res.json('Тебе сюда нельзя (пока что)');
+      }
     } else {
-      res.json('Тебе сюда нельзя (пока что)');
+      res.json({ success: false });
     }
-
-    /*
-    id Загадки - это ее номер по порядку. Если длина массива меньше  или равна номеру загадки, то пользователь может посмотреть ее условие, если запрошенный номер больше доступных пользователю, то возникает ошибка 
-    */
   } catch (err) {
     console.error(err.message);
     res.status(500).json('Проблема на сервере');
@@ -135,6 +134,9 @@ router.post('/:id', auth, async (req, res) => {
   try {
     let id = parseInt(req.params.id);
 
+    let id_quest = parseInt(req.params.id_quest);
+    let quest = await Quest.findOne({ _id: id_quest });
+
     let userID = req.user.id;
     let user = await User.findOne({ _id: userID });
 
@@ -146,8 +148,11 @@ router.post('/:id', auth, async (req, res) => {
         }
       ]
     };
+    quest.registered.push(id);
+
     user.quests.push(quests);
     await user.save();
+    await quest.save();
     res.json(user);
   } catch (err) {
     console.error(err.message);

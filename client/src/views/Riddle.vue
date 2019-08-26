@@ -54,7 +54,7 @@
           class="title text-xs-left task-text"
         ></v-card-text>
 
-        <v-alert dense border="left" value="dist > 20" type="warning" class="mx-2">
+        <v-alert dense border="left" value="dist > 20" v-if="dist > 20" type="warning" class="mx-2">
           Информация станет доступна, как только Ваше расстояние станет меньше 5 метров
           <p v-if="dist == 999999">
             <br />Ой, кажется, вы забыли включить GPS, либо разрешить приложению доступ в настройках. Исправьте и возвращайтесь сюда!
@@ -74,6 +74,7 @@
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
         </v-card-title>
+        <div class="card">Текст</div>
 
         <v-card-text
           style="line-height: 1.2em"
@@ -106,7 +107,7 @@
         <v-btn
           @click="postAnswer(riddle.nextNum)"
           :loading="loading"
-          :disabled="riddle.type == 'geo' && dist > 5"
+          :disabled="riddle.type == 'geo' && dist > 20"
           class="ml-2 mb-3"
           fab
           dark
@@ -174,6 +175,10 @@ export default {
     }),
     success() {
       return this.$store.state.quest.success;
+    },
+    isAdmin() {
+      console.log(localStorage.getItem("user"));
+      return localStorage.getItem("user");
     }
   },
   beforeUpdate() {
