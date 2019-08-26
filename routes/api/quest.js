@@ -61,12 +61,8 @@ router.get('/:id_quest/:id_riddle', auth, async (req, res) => {
   let quest = await Quest.findOne({ _id: id_quest });
 
   try {
-    console.log(user.isAdmin);
-    console.log(Date.now() > quest.dateStartInUTC);
-    console.log(quest.dateStartInUTC);
     if (user.isAdmin || Date.now() > quest.dateStartInUTC) {
       let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle)[0];
-      console.log(getQuest);
       //Перебор по решенным загадкам пользователя, собираем ID в массив
       let solved = userRiddles[0].riddles.map(riddle => {
         return riddle.id;

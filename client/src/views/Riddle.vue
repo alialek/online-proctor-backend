@@ -10,7 +10,12 @@
     </v-toolbar>
 
     <section class="content">
-      <h2 v-if="!riddle.type">Кажется, квест еще не начался. Но Вы возвращайтесь в день старта!</h2>
+      <h2
+        align="center"
+        class="mx-2 mt-2"
+        style="color:white"
+        v-if="!riddle.type"
+      >Кажется, квест еще не начался. Но Вы возвращайтесь в день старта!</h2>
       <div v-if="riddle.type == 'ar'">
         <v-dialog v-model="dialog">
           <iframe
