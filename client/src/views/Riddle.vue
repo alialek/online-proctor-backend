@@ -10,6 +10,7 @@
     </v-toolbar>
 
     <section class="content">
+      <h2 v-if="!riddle.type">Кажется, квест еще не начался. Но Вы возвращайтесь в день старта!</h2>
       <div v-if="riddle.type == 'ar'">
         <v-dialog v-model="dialog">
           <iframe
@@ -74,7 +75,6 @@
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
         </v-card-title>
-        <div class="card">Текст</div>
 
         <v-card-text
           style="line-height: 1.2em"
