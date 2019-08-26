@@ -150,7 +150,9 @@ router.post('/:id', auth, async (req, res) => {
     quest.registered.push(userID);
     user.quests.push(quests);
     await user.save();
-    await quest.save();
+    quest.save().then(data => {
+      console.log(data.registered);
+    });
     res.json(user);
   } catch (err) {
     console.error(err.message);
