@@ -147,9 +147,7 @@ router.post('/:id', auth, async (req, res) => {
         }
       ]
     };
-    quest.registered.push(id);
-    console.log(quest.registered);
-
+    quest.registered.push(userID);
     user.quests.push(quests);
     await user.save();
     await quest.save();
