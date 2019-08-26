@@ -43,8 +43,14 @@
         </v-layout>
         <v-layout class="mt-2 mb-2" style="z-index: 1" v-for="event in events" :key="event.id">
           <v-flex xs12>
-            <router-link :to="'/event/'+event._id">
-              <v-card style="border-radius: 5px;" ripple color="white darken-2" class="blue--text">
+            <router-link :to="event.available ? '/event/'+event._id : ''">
+              <v-card
+                :disabled="!event.available"
+                style="border-radius: 5px;"
+                ripple
+                color="white darken-2"
+                class="blue--text"
+              >
                 <v-layout>
                   <v-flex xs5>
                     <v-img :src="event.image" height="100px" style="border-radius: 5px; " cover></v-img>

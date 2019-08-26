@@ -134,12 +134,11 @@ router.post('/:id', auth, async (req, res) => {
   try {
     let id = parseInt(req.params.id);
 
-    let id_quest = parseInt(req.params.id_quest);
-    let quest = await Quest.findOne({ _id: id_quest });
+    let quest = await Quest.findOne({ _id: id });
 
     let userID = req.user.id;
     let user = await User.findOne({ _id: userID });
-
+    console.log(user);
     quests = {
       id: id,
       riddles: [
@@ -149,6 +148,7 @@ router.post('/:id', auth, async (req, res) => {
       ]
     };
     quest.registered.push(id);
+    console.log(quest.registered);
 
     user.quests.push(quests);
     await user.save();
