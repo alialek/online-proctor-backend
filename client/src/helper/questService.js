@@ -1,7 +1,7 @@
 import authHeader from './authHeader';
 import axios from 'axios';
 
-const apiUrl = 'https://net-quest.herokuapp.com';
+const apiUrl = 'https://app.netquest.ru';
 
 async function getEvents() {
   return await axios.get(`${apiUrl}/api/quest`);
