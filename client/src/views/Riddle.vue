@@ -111,7 +111,7 @@
           class="ml-2 mb-3"
           fab
           dark
-          color="green darken-1"
+          :color="success ? 'green darken-1' : 'red darken-1'"
         >
           <v-icon dark>arrow_right</v-icon>
         </v-btn>
@@ -175,10 +175,6 @@ export default {
     }),
     success() {
       return this.$store.state.quest.success;
-    },
-    isAdmin() {
-      console.log(localStorage.getItem("user"));
-      return localStorage.getItem("user");
     }
   },
   beforeUpdate() {

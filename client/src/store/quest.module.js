@@ -122,6 +122,7 @@ export const quest = {
         );
       } else {
         this.state.success = false;
+        setTimeout((this.state.success = true), 2000);
       }
       state.loading = false;
     }
