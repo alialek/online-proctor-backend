@@ -1,7 +1,7 @@
 <template dark>
   <section class="riddle">
     <v-toolbar fixed style="background-size: cover; background-color: rgba(0,0,0,1); " dark>
-      <router-link :to="riddle.backToNum == 0 ? '/' : String(riddle.backToNum)">
+      <router-link :to="riddle.backToNum == 0 || riddle.backToNum === undefined ? '/' : String(riddle.backToNum)">
         <v-toolbar-side-icon>
           <v-icon>arrow_back</v-icon>
         </v-toolbar-side-icon>

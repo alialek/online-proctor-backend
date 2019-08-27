@@ -4,8 +4,11 @@
       <v-layout style="height: 100%" align-center align-content-center justify-center dark>
         <v-flex class="mx-3 col-xs-12 col-md-6">
           <h2
-            style="font-size:40px;text-align:center;color: white; font-family: Montserrat"
-          >NetQuest</h2>
+            style="font-size:40px;text-align:center;color: white; font-family: Montserrat !important"
+          >
+            NetQuest
+            <small style="font-size: 15px; font-weight: 300">beta</small>
+          </h2>
           <transition appear>
             <v-tabs
               style="width: 100%;"
