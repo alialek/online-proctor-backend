@@ -36,13 +36,13 @@ export default {
         case "profile":
           return "#353941";
         case "events":
-          return "#4ab8e1";
+          return "#8d00ff";
         case "teams":
           return "#ffab2d";
         case "Riddle":
           return "black";
         default:
-          return "#4ab8e1";
+          return "#8d00ff";
       }
     },
     bottomNav() {

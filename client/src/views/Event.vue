@@ -18,7 +18,7 @@
         <v-spacer></v-spacer>
 
         <v-btn @click="getLink" fab dark color="pink" style="margin-top: 60px;">
-          <v-icon dark>gamepad</v-icon>
+          <v-icon dark>mdi-play-circle</v-icon>
         </v-btn>
       </template>
 
@@ -27,24 +27,24 @@
     <v-flex v-if="event" xs12 class="content">
       <v-layout>
         <v-flex column class="d-flex flex-column justify-center align-center align-content-center">
-          <v-icon large dark color="green">group</v-icon>
+          <v-icon large dark color="#8d00ff">group</v-icon>
 
           <h5>{{event.tags.typeTeam}}</h5>
         </v-flex>
         <v-flex class="d-flex flex-column justify-center align-center align-content-center">
-          <v-icon large dark color="red">book</v-icon>
+          <v-icon large dark color="#8d00ff">book</v-icon>
 
           <h5>{{event.tags.typeGenre}}</h5>
         </v-flex>
       </v-layout>
-      <v-layout>
+      <v-layout class="mt-2">
         <v-flex xs6 class="d-flex flex-column justify-center align-center align-content-center">
-          <v-icon large dark color="blue">access_time</v-icon>
+          <v-icon large dark color="#8d00ff">access_time</v-icon>
 
           <h5>{{event.tags.typeTime}}</h5>
         </v-flex>
         <v-flex xs6 class="d-flex flex-column justify-center align-center align-content-center">
-          <v-icon large dark color="orange">pin_drop</v-icon>
+          <v-icon large dark color="#8d00ff">pin_drop</v-icon>
 
           <h5>{{event.tags.location}}</h5>
         </v-flex>
@@ -117,7 +117,7 @@ export default {
       this.$store.dispatch("users/gameRegister", this.$route.params.id);
 
       this.dialog = false;
-      this.$router.push("/quest/" + this.$route.params.id + "/riddle/" + 1);
+      this.$router.push("/quest/" + this.$route.params.id + "/riddle/" + 0);
     }
   },
   computed: {

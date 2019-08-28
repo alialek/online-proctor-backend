@@ -2,7 +2,12 @@
   <div>
     <section class="events">
       <div class="header">
-        <div class="header__name">События</div>
+        <v-layout justify-space-between>
+          <div class="header__name">События</div>
+          <router-link to="/test">
+            <v-icon>mdi-crosshairs-question</v-icon>
+          </router-link>
+        </v-layout>
         <div class="header__sub">Актуальное</div>
         <v-flex xs12 style="z-index: 999; margin-top: 5px;">
           <router-link :to="'/event/'+actualEvent[0]._id">
@@ -26,8 +31,10 @@
                 <v-flex xs7>
                   <v-card-title>
                     <div>
-                      <div class="headline">{{actualEvent[0].title}}</div>
-                      <div>{{actualEvent[0].dateStart}}</div>
+                      <div class="headline">
+                        <b>{{actualEvent[0].title}}</b>
+                      </div>
+                      <div class="date">{{actualEvent[0].dateStart}}</div>
                       <v-progress-circular indeterminate color="primary" v-if="loading"></v-progress-circular>
                     </div>
                   </v-card-title>
@@ -59,7 +66,7 @@
                     <v-card-title>
                       <div>
                         <div class="headline">{{event.title}}</div>
-                        <div>{{event.dateStart}}</div>
+                        <div class="date">{{event.dateStart}}</div>
                       </div>
                     </v-card-title>
                   </v-flex>
@@ -118,11 +125,20 @@ export default {
 .header {
   width: 100%;
   height: 200px;
-  background-color: #4ab8e1;
+  background: linear-gradient(221deg, #8d00ff, #4260db);
+  background-size: 100% 100%;
+
+  -webkit-animation: loginsection 40s ease infinite;
+  -moz-animation: loginsection 40s ease infinite;
+  animation: loginsection 40s ease infinite;
   border-radius: 0 0 30px 30px;
   color: white;
   padding: 20px;
   position: fixed;
+}
+
+.headline {
+  color: #8d00ff;
 }
 
 .header__name {
@@ -146,6 +162,9 @@ export default {
   color: lightgray;
   text-transform: uppercase;
   font-size: 14px;
+}
+.date {
+  color: #8d00ff;
 }
 </style>
 

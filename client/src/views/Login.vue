@@ -22,8 +22,15 @@
               <v-tab ripple>Я играю впервые</v-tab>
               <v-tab-item>
                 <v-form dark @submit.prevent="handleAuth">
-                  <v-text-field dark v-model="email" label="E-mail" required></v-text-field>
-                  <v-text-field dark v-model="password" type="password" label="Пароль" required></v-text-field>
+                  <v-text-field color="white" dark v-model="email" label="E-mail" required></v-text-field>
+                  <v-text-field
+                    color="white"
+                    dark
+                    v-model="password"
+                    type="password"
+                    label="Пароль"
+                    required
+                  ></v-text-field>
                   <v-layout justify-left align-center>
                     <span style="font-size:30px; font-weight: 600; color: white">Войти</span>
                     <v-btn
@@ -39,10 +46,18 @@
               </v-tab-item>
               <v-tab-item>
                 <v-form dark @submit.prevent="handleReg">
-                  <v-text-field dark v-model="name" label="Фамилия и Имя" required></v-text-field>
+                  <v-text-field color="white" dark v-model="name" label="Фамилия и Имя" required></v-text-field>
 
-                  <v-text-field dark v-model="email" label="E-mail" required></v-text-field>
-                  <v-text-field dark v-model="password" type="password" label="Пароль" required></v-text-field>
+                  <v-text-field dark color="white" v-model="email" label="E-mail" required></v-text-field>
+                  <v-text-field
+                    dark
+                    color="white"
+                    :rules="[rules.required, rules.min]"
+                    v-model="password"
+                    type="password"
+                    label="Пароль"
+                    required
+                  ></v-text-field>
                   <v-layout align-center>
                     <span style="font-size:30px; font-weight: 600; color: white">В игру</span>
                     <v-btn
@@ -76,7 +91,11 @@ export default {
       email: "",
       password: "",
       date: "",
-      menu: false
+      menu: false,
+      rules: {
+        required: value => !!value || "Введите пароль",
+        min: v => v.length >= 8 || "Минимальная длина - 8 символов"
+      }
     };
   },
   computed: {
@@ -127,40 +146,6 @@ export default {
   width: 100%;
   height: 300px;
   overflow: hidden;
-}
-
-@-webkit-keyframes loginsection {
-  0% {
-    background-position: 0% 90%;
-  }
-  50% {
-    background-position: 100% 11%;
-  }
-  100% {
-    background-position: 0% 90%;
-  }
-}
-@-moz-keyframes loginsection {
-  0% {
-    background-position: 0% 90%;
-  }
-  50% {
-    background-position: 100% 11%;
-  }
-  100% {
-    background-position: 0% 90%;
-  }
-}
-@keyframes loginsection {
-  0% {
-    background-position: 0% 90%;
-  }
-  50% {
-    background-position: 100% 11%;
-  }
-  100% {
-    background-position: 0% 90%;
-  }
 }
 </style>
 

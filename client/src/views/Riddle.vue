@@ -1,21 +1,34 @@
 <template dark>
   <section class="riddle">
     <v-toolbar fixed style="background-size: cover; background-color: rgba(0,0,0,1); " dark>
-      <router-link :to="riddle.backToNum == 0 || riddle.backToNum === undefined ? '/' : String(riddle.backToNum)">
-        <v-toolbar-side-icon>
-          <v-icon>arrow_back</v-icon>
-        </v-toolbar-side-icon>
-      </router-link>
-      <v-toolbar-title class="white--text">{{riddle.title}}</v-toolbar-title>
+      <v-layout justify-space-between align-center align-content-center>
+        <v-layout align-center>
+          <router-link
+            :to="riddle.backToNum == 0 || riddle.backToNum === undefined ? '/' : String(riddle.backToNum)"
+          >
+            <v-toolbar-side-icon>
+              <v-icon>arrow_back</v-icon>
+            </v-toolbar-side-icon>
+          </router-link>
+          <v-toolbar-title class="white--text">{{riddle.title}}</v-toolbar-title>
+        </v-layout>
+        <div>
+          <router-link to="/">
+            <v-toolbar-side-icon>
+              <v-icon>mdi-home-variant</v-icon>
+            </v-toolbar-side-icon>
+          </router-link>
+        </div>
+      </v-layout>
     </v-toolbar>
 
     <section class="content">
       <h2
         align="center"
         class="mx-2 mt-2"
-        style="color:white"
-        v-if="!riddle.type"
-      >Кажется, квест еще не начался. Но Вы возвращайтесь в день старта!</h2>
+        style="color:white; height: 100%; padding-top: 50%;"
+        v-if="this.countDown && !isAdmin"
+      >Кажется, квест еще не начался. Задания откроются совсем скоро! Возвращайтесь сюда {{this.countDown}}</h2>
       <div v-if="riddle.type == 'ar'">
         <v-dialog v-model="dialog">
           <iframe
@@ -25,7 +38,7 @@
             :name="name"
           ></iframe>
         </v-dialog>
-        <v-card class="mx-auto task-card grey darken-3" style="margin-bottom: 120px" dark>
+        <v-card class="mx-auto task-card grey darken-3" dark>
           <v-card-title>
             <v-icon medium left>mdi-cube-scan</v-icon>
             <span class="title font-weight-light">Дополненная реальность</span>
@@ -42,12 +55,7 @@
           <v-card-text v-if="arHidden">{{riddle.text}}</v-card-text>
         </v-card>
       </div>
-      <v-card
-        v-if="riddle.type == 'geo'"
-        class="mx-auto task-card grey darken-3"
-        style="margin-bottom: 120px"
-        dark
-      >
+      <v-card v-if="riddle.type == 'geo'" class="mx-auto task-card grey darken-3" dark>
         <v-card-title>
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
@@ -60,27 +68,27 @@
           class="title text-xs-left task-text"
         ></v-card-text>
 
+        <v-icon text="mdi-geolocation">mdi-geolocation</v-icon>
+        <v-card-text class="title mb-2" v-if="dist > 20">
+          <div class="radar">
+            <div class="pointer"></div>
+            <div class="shadow"></div>
+          </div>
+          <br />
+          <div align="center">До цели: {{dist}}м.</div>
+        </v-card-text>
         <v-alert dense border="left" value="dist > 20" v-if="dist > 20" type="warning" class="mx-2">
-          Информация станет доступна, как только Ваше расстояние станет меньше 5 метров
+          Информация станет доступна, как только Ваше расстояние станет меньше 20 метров
           <p v-if="dist == 999999">
             <br />Ой, кажется, вы забыли включить GPS, либо разрешить приложению доступ в настройках. Исправьте и возвращайтесь сюда!
           </p>
         </v-alert>
-
-        <v-icon text="mdi-geolocation">mdi-geolocation</v-icon>
-        <v-card-text class="title mb-2" v-if="dist > 20">До цели: {{dist}}м.</v-card-text>
       </v-card>
-      <v-card
-        v-if="riddle.type == 'text'"
-        class="mx-auto task-card grey darken-3"
-        style="margin-bottom: 120px"
-        dark
-      >
+      <v-card v-if="riddle.type == 'text'" class="mx-auto task-card grey darken-3" dark>
         <v-card-title>
           <v-icon medium left>extension</v-icon>
           <span class="title font-weight-light">Задание #{{riddle.num}}</span>
         </v-card-title>
-
         <v-card-text
           style="line-height: 1.2em"
           v-html="riddle.text"
@@ -90,30 +98,32 @@
     </section>
 
     <v-form
-      style="bottom:40px; position: fixed; width: 100%; background-color: black;border-radius:30px 30px 0px 0px"
+      style="bottom:0px; position: fixed; width: 100%; background-color: black"
       v-if="!riddle.last"
       @submit.prevent="postAnswer"
       class="px-3 pt-1"
     >
-      <v-layout align-center justify-space-between>
+      <v-layout align-center justify-space-between align-content-center>
         <v-text-field
           v-model="answer"
           v-if="riddle.required"
-          class="ml-2 mt-2"
+          class="ml-2 pt-2"
           light
+          dense
           solo
+          flat
           placeholder="Ответ"
         ></v-text-field>
         <p
           v-if="!riddle.required"
           style="color:white; text-align: "
-          class="headline mb-3 text-xs-right font-weight-bold"
+          class="headline text-xs-right font-weight-bold"
         >Далее</p>
         <v-btn
           @click="postAnswer(riddle.nextNum)"
           :loading="loading"
           :disabled="riddle.type == 'geo' && dist > 20"
-          class="ml-2 mb-3"
+          class="ml-2 mb-4"
           fab
           dark
           :color="success ? 'green darken-1' : 'red darken-1'"
@@ -126,7 +136,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { getDistance } from "geolib";
 export default {
   name: "Riddle",
@@ -144,6 +154,7 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("quest/getRiddle", this.$route.params);
+    this.$store.dispatch("quest/getEventByID", this.$route.params.id);
   },
   methods: {
     startAR() {
@@ -173,13 +184,19 @@ export default {
   },
   computed: {
     ...mapState("quest", {
-      riddle: state => state.riddle
+      loading: state => state.loading,
+      riddle: state => state.riddle,
+      success: state => state.success,
+      event: state => state.event
     }),
-    ...mapState("quest", {
-      loading: state => state.loading
-    }),
-    success() {
-      return this.$store.state.quest.success;
+    countDown() {
+      return Date.now() > this.event.dateStartInUTC
+        ? false
+        : this.event.dateStart;
+    },
+    isAdmin() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      return user.user.isAdmin;
     }
   },
   beforeUpdate() {
@@ -221,9 +238,7 @@ export default {
             }
           );
         },
-        function error(msg) {
-          alert("Please enable your GPS position feature.");
-        },
+        function error(msg) {},
         options
       );
     }
@@ -250,11 +265,13 @@ export default {
 }
 
 .task-card {
-  max-height: calc(100vh - 120px);
+  max-height: calc(100vh - 160px);
+  min-height: calc(100vh - 160px);
+  overflow-y: scroll;
 }
 
 .task-text {
-  max-height: 60vh;
+  height: 100%;
   font-size: 1.2em;
   overflow-y: scroll;
   line-height: 1.6em !important;
@@ -272,6 +289,112 @@ export default {
 .a-canvas {
   z-index: 999999;
   overflow: hidden;
+}
+
+.radar {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  background-size: 200px 200px;
+  border-radius: 360px;
+  left: 50%;
+  margin-left: -100px;
+  background: url(https://netquest.ru/quest_res/radar.png) no-repeat 50% 50%;
+  background-size: contain;
+}
+
+.radar:hover {
+  background: none;
+}
+
+.radar .pointer {
+  position: absolute;
+  z-index: 1024;
+  left: 10.5820106%;
+  right: 10.5820106%;
+  top: 10.5820106%;
+  bottom: 50%;
+  will-change: transform;
+  -webkit-transform-origin: 50% 100%;
+  transform-origin: 50% 100%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background-image: linear-gradient(
+    135deg,
+    rgba(5, 162, 185, 0.8) 0%,
+    rgba(0, 0, 0, 0.02) 70%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-clip-path: polygon(100% 0, 100% 10%, 50% 100%, 0 100%, 0 0);
+  clip-path: polygon(100% 0, 100% 10%, 50% 100%, 0 100%, 0 0);
+  -webkit-animation: rotate360 3s infinite linear;
+  animation: rotate360 3s infinite linear;
+}
+
+.radar .pointer:after {
+  content: "";
+  position: absolute;
+  width: 50%;
+  bottom: -1px;
+  border-top: 2px solid rgba(0, 231, 244, 0.8);
+  box-shadow: 0 0 3px rgba(0, 231, 244, 0.6);
+  border-radius: 9px;
+}
+
+.shadow {
+  position: absolute;
+  left: 11%;
+  top: 11%;
+  right: 11%;
+  bottom: 11%;
+  margin: auto;
+  border-radius: 9999px;
+  box-shadow: 0 0 66px 6px #a51414;
+  -webkit-animation: shadow 1s infinite ease;
+  animation: shadow 1s infinite ease;
+}
+
+@-webkit-keyframes rotate360 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes rotate360 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+@-webkit-keyframes shadow {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes shadow {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 </style>
 

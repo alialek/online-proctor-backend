@@ -11,19 +11,18 @@ export const quest = {
         isActual: true
       }
     ],
-    event: [
-      {
-        image: '',
-        _id: '',
-        title: 'Загрузка',
-        tags: {
-          typeTeam: '',
-          location: '',
-          typeGenre: '',
-          typeTime: ''
-        }
-      }
-    ],
+    event: {
+      image: '',
+      _id: '',
+      title: 'Загрузка',
+      tags: {
+        typeTeam: '',
+        location: '',
+        typeGenre: '',
+        typeTime: ''
+      },
+      dateStartInUTC: ''
+    },
     riddle: [
       {
         title: 'Загрузка...'
@@ -65,7 +64,6 @@ export const quest = {
     },
     getRiddle(context, params) {
       context.commit('setLoading');
-      console.log(params);
       let questID = params.id;
       let riddleID = params.riddle_id;
       try {
@@ -83,7 +81,6 @@ export const quest = {
       let answer = params.answer;
       let nextNum = params.nextNum;
 
-      console.log(nextNum);
       try {
         questService.postAnswer(questID, riddleID, answer).then(data => {
           data.json().then(res => {

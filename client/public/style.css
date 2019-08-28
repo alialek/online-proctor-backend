@@ -13,3 +13,37 @@
 .a-canvas {
   position: relative !important;
 }
+
+@-webkit-keyframes loginsection {
+  0% {
+    background-position: 0% 90%;
+  }
+  50% {
+    background-position: 100% 11%;
+  }
+  100% {
+    background-position: 0% 90%;
+  }
+}
+@-moz-keyframes loginsection {
+  0% {
+    background-position: 0% 90%;
+  }
+  50% {
+    background-position: 100% 11%;
+  }
+  100% {
+    background-position: 0% 90%;
+  }
+}
+@keyframes loginsection {
+  0% {
+    background-position: 0% 90%;
+  }
+  50% {
+    background-position: 100% 11%;
+  }
+  100% {
+    background-position: 0% 90%;
+  }
+}

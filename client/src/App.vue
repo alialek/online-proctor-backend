@@ -1,7 +1,7 @@
 <template>
   <v-app class="application">
     <router-view></router-view>
-    <Navbar v-if="isLogged" />
+    <Navbar v-if="isLogged && !riddle" />
   </v-app>
 </template>
 
@@ -20,6 +20,9 @@ export default {
     },
     isLoading() {
       return this.$store.state.quest.isLoading;
+    },
+    riddle() {
+      return this.$route.name == "Riddle" ? true : false;
     }
   }
 };
