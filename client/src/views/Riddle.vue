@@ -31,12 +31,18 @@
       >Кажется, квест еще не начался. Задания откроются совсем скоро! Возвращайтесь сюда {{this.countDown}}</h2>
       <div v-if="riddle.type == 'ar'">
         <v-dialog fullscreen v-model="dialog">
-          <v-btn style="position:absolute; top: 0; left: 10px;" icon dark color="red" @click="dialog = false">
+          <v-btn
+            style="position:absolute; top: 0; left: 10px;"
+            icon
+            dark
+            color="red"
+            @click="dialog = false"
+          >
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <iframe
             allow="camera"
-            style=" border: 0; border-radius: 10; width: 100%; height: 60vh"
+            style=" border: 0; border-radius: 10; width: 100%; height: 100%"
             :src="riddle.location[0]"
             :name="name"
           ></iframe>
