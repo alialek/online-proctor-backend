@@ -30,7 +30,10 @@
         v-if="this.countDown && !isAdmin"
       >Кажется, квест еще не начался. Задания откроются совсем скоро! Возвращайтесь сюда {{this.countDown}}</h2>
       <div v-if="riddle.type == 'ar'">
-        <v-dialog v-model="dialog">
+        <v-dialog fullscreen v-model="dialog">
+          <v-btn style="position:absolute; top: 0; left: 10px;" icon dark color="red" @click="dialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
           <iframe
             allow="camera"
             style=" border: 0; border-radius: 10; width: 100%; height: 60vh"
@@ -301,6 +304,10 @@ export default {
   margin-left: -100px;
   background: url(https://netquest.ru/quest_res/radar.png) no-repeat 50% 50%;
   background-size: contain;
+}
+
+b {
+  font-weight: 600 !important;
 }
 
 .radar:hover {
