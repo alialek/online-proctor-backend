@@ -23,12 +23,7 @@
     </v-toolbar>
 
     <section class="content">
-      <h2
-        align="center"
-        class="mx-2 mt-2"
-        style="color:white; height: 100%; padding-top: 50%;"
-        v-if="this.countDown && !isAdmin"
-      >Кажется, квест еще не начался. Задания откроются совсем скоро! Возвращайтесь сюда {{this.countDown}}</h2>
+     
       <div v-if="riddle.type == 'ar'">
         <v-dialog fullscreen v-model="dialog">
           <v-btn
