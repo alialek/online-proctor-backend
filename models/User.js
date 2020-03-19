@@ -32,6 +32,16 @@ const userQuestSchema = new mongoose.Schema({
   }
 });
 
+const userTestSchema = new mongoose.Schema({
+  id: {
+    type: Number
+  },
+  tests: {
+    type: Array,
+    default: []
+  },
+});
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -54,10 +64,14 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  tests: [],
   quests: [userQuestSchema]
 });
 
-const userQuest = mongoose.model('userQuest', userQuestSchema);
-const userRiddle = mongoose.model('userRiddle', userRiddleSchema);
+// const userQuest = mongoose.model('userQuest', userQuestSchema);
+// const userRiddle = mongoose.model('userRiddle', userRiddleSchema);
+// const userTest = mongoose.model('userTest', userTestSchema);
 
-module.exports = User = mongoose.model('user', UserSchema);
+module.exports = {User: mongoose.model('user', UserSchema),
+Riddle: mongoose.model('riddle', userRiddleSchema),
+Test: mongoose.model('test', userTestSchema)}

@@ -3,15 +3,18 @@ const connectDB = require('./config/db');
 const app = express();
 const path = require('path');
 const cors = require('cors');
+const bodyParser = require('body-parser')
 
 connectDB();
 app.use(cors());
+app.use(bodyParser());
 app.use(express.json({ extended: false }));
 
 app.use('/api/users', require('./routes/api/users'));
 app.use('/api/quest', require('./routes/api/quest'));
 app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/orders', require('./routes/api/orders'));
+app.use('/api/test', require('./routes/api/test'));
 
 // Serve static assets in prod
 if (process.env.NODE_ENV === 'production') {
