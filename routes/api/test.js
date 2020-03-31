@@ -4,7 +4,7 @@ const auth = require("../../middleware/auth");
 const isAdmin = require("../../middleware/isAdmin");
 const isAuthor = require("../../middleware/isAuthor");
 const { User } = require("../../models/User");
-const { Test, Question } = require("../../models/Test");
+const { Test, Question, Answer } = require("../../models/Test");
 const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const config = require("config");
@@ -22,10 +22,10 @@ router.post("/", isAdmin, async (req, res) => {
     const newTest = new Test({
       title: req.body.title,
       description: req.body.description,
-      tries: req.body.tries,
-      amount: req.body.amount,
-      results: [],
+      timeToAnswer: req.body.timeToAnswer,
+      createdBy: req.user.id,
       questions: [],
+      participants: [],
     });
     const test = await newTest.save();
 
@@ -34,35 +34,6 @@ router.post("/", isAdmin, async (req, res) => {
     await user.save();
 
     res.json(test);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
-  }
-});
-
-//@route   PUT api/test/id
-//@desc    Обновление теста
-//@access  Authenticated, isAdmin
-
-router.put("/:id", isAdmin, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  try {
-    let test = await Test.findOne({ _id: id });
-    let user = await User.findById(req.user.id);
-    if (user.test.find(test_id => test_id == id)) {
-      (test.title = req.body.title),
-        (test.description = req.body.description),
-        (test.tries = req.body.tries),
-        (test.amount = req.body.amount);
-      const newTest = await test.save();
-      let { title, description, tries, amount } = newTest;
-      return res.json({ title, description, tries, amount });
-    } else {
-      return res.status(401).json({ status: "error", msg: "Нет прав" });
-    }
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -79,9 +50,8 @@ router.get("/", isAdmin, async (req, res) => {
     let test = await Test.find()
       .where("_id")
       .in(user.tests)
-      .select(["id", "title", "description"])
+      .select(["id", "title", "description", "isActive"])
       .exec();
-    console.log(test);
     res.json(test);
   } catch (err) {
     console.error(err.message);
@@ -95,15 +65,36 @@ router.get("/", isAdmin, async (req, res) => {
 
 router.get("/:id", isAuthor, async (req, res) => {
   let id = req.params.id;
+  let stop = req.query.id;
+  let test = await Test.findById(id);
+  try {
+    if (stop) {
+      test.isActive = false;
+      res.json(await test.save());
+    } else {
+      let user = await User.findById(req.user.id);
+      if (user.tests.indexOf(id) >= 0) {
+        res.json(test);
+      } else {
+        res.status(401).json({ status: "error", message: "Нет прав" });
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json("Проблема на сервере");
+  }
+});
+
+//@route   Get api/test/:id_test/:id_question
+//@desc    Посмотреть ответы на определенный вопрос
+//@access  Автор
+
+router.put("/:id_test/:id_question", isAuthor, async (req, res) => {
+  let id_question = parseInt(req.params.id_question);
 
   try {
-    let user = await User.findById(req.user.id);
-    if (user.tests.indexOf(id) >= 0) {
-      let test = await Test.findById(id);
-      res.json(test);
-    } else {
-      res.status(401).json({ status: "error", message: "Нет прав" });
-    }
+    let question = await Question.findById(id_question);
+    res.json(question);
   } catch (err) {
     console.error(err.message);
     res.status(500).json("Проблема на сервере");
@@ -111,8 +102,8 @@ router.get("/:id", isAuthor, async (req, res) => {
 });
 
 //@route   POST api/test/:id
-//@desc    Save Questions
-//@access  Author
+//@desc    Отправка нового вопроса
+//@access  Автор
 
 router.post("/:id", isAuthor, async (req, res) => {
   let idTest = req.params.id;
@@ -120,95 +111,82 @@ router.post("/:id", isAuthor, async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  try {
-    let test = await Test.findById(idTest);
-    console.log(test.questions)
-    let questions = await Question.create(req.body);
+  if (req.query.stop)
+    try {
+      let test = await Test.findById(idTest);
+      let questions = await Question.create({
+        question: req.body.question,
+        answers: [],
+        until: Math.floor(Date.now() / 1000) + test.timeToAnswer + 5,
+      });
 
-    test.questions.push(...questions);
-    const newTest = await test.save();
+      test.questions.push(...questions);
+      const newTest = await test.save();
 
-    res.json(newTest);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
-  }
+      res.json(questions);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server error");
+    }
 });
 
+//@route   PUT api/test/:id/:question
+//@desc    Поставить оценку
+//@access  Auth user
 
-//@route   PUT api/test/:id/:riddle
-//@desc    Edit Question
-//@access  Author
-
-router.put("/:id/:riddle", isAuthor, async (req, res) => {
+router.put("/:id/:question", isAuthor, async (req, res) => {
   let idTest = req.params.id;
-  let idRiddle = req.params.riddle
+  let idQuestion = req.params.question;
   const errors = validationResult(req);
-  let {title, description, answer, type, timeToSolve, imageUrl, videoUrl} = req.body
+  let { answer } = req.body;
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    let question = await Question.findById(idRiddle)
-    question = {
-      title, description, answer, type, timeToSolve, imageUrl, videoUrl
-    }
+    let answer = await Answer.findById(req.body.id);
+    answer.mark = req.body.mark;
+    let result = await answer.save();
 
-    question.title = 'Лол'
-    let newQuestion = await question.save()
-
-    let test = await Test.findById(id)
-    let oldquests = test.questions.map(quest => {
-      quest._id != question.id
-    })
-    test.questions.push(...oldquests, question);
-    await test.save()
-    // test.questions.push(...questions);
-    // const newTest = await test.save();
-
-    res.json(newQuestion);
+    res.json(result);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
   }
 });
 
+//@route   PUT api/test/:id/:question
+//@desc    Отправить ответ
+//@access  Auth user
 
-//@route   Get api/test/:id_test/:id_question
-//@desc    Get full riddle by ID
-//@access  Private
-
-router.put("/:id_test/:id_question", isAuthor, async (req, res) => {
-  let id_test = parseInt(req.params.id_quest);
-  let id_question = parseInt(req.params.id_riddle);
-  //Получаем количество решенных загадок у пользователя в данном квесте
+router.put("/:id/:question", auth, async (req, res) => {
+  let idTest = req.params.id;
+  let questionId = req.params.question;
+  const errors = validationResult(req);
+  let { answer } = req.body;
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
-    let test = Test.findById(id_test).select("riddles");
-
-    if (user) {
-      let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle)[0];
-      //Перебор по решенным загадкам пользователя, собираем ID в массив
-      let solved = userRiddles[0].riddles.map(riddle => {
-        return riddle.id;
+    let question = await Question.findById(questionId);
+    if (question.until > Math.floor(Date.now() / 1000)) {
+      let newAnswer = await Answer.create({
+        answer,
+        questionId,
+        userName: req.user.name,
+        userId: req.user.id,
+        mark: 0,
       });
-      //Проверим, может, загадка уже решена, тогда принимаем любой ответ
-      let alreadyAnswered = solved.filter(x => x == id_riddle);
-      //Функция для сравнения, есть ли в solved все ID из riddle.requires
-      let intersection = riddle.requires.filter(x => solved.includes(x));
 
-      if (alreadyAnswered.length !== 0) {
-        res.json(riddle);
-      } else if (intersection.length == riddle.requires.length) {
-        res.json(riddle);
-      } else {
-        res.json("Тебе сюда нельзя (пока что)");
-      }
+      await question.answer.push(newAnswer);
+      res.status(200).json({ status: "success", message: "Ответ сохранен" });
     } else {
-      res.json({ success: false });
+      res
+        .status(300)
+        .json({ status: "failed", message: "Время ответа истекло" });
     }
   } catch (err) {
     console.error(err.message);
-    res.status(500).json("Проблема на сервере");
+    res.status(500).send("Server error");
   }
 });
 
@@ -332,3 +310,32 @@ router.post("/:id_quest/:id_riddle", auth, async (req, res) => {
 });
 
 module.exports = router;
+
+// //@route   PUT api/test/id
+// //@desc    Обновление теста
+// //@access  Authenticated, isAdmin
+
+// router.put("/:id", isAdmin, async (req, res) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ errors: errors.array() });
+//   }
+//   try {
+//     let test = await Test.findOne({ _id: id });
+//     let user = await User.findById(req.user.id);
+//     if (user.test.find(test_id => test_id == id)) {
+//       (test.title = req.body.title),
+//         (test.description = req.body.description),
+//         (test.tries = req.body.tries),
+//         (test.amount = req.body.amount);
+//       const newTest = await test.save();
+//       let { title, description, tries, amount } = newTest;
+//       return res.json({ title, description, tries, amount });
+//     } else {
+//       return res.status(401).json({ status: "error", msg: "Нет прав" });
+//     }
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send("Server error");
+//   }
+// });

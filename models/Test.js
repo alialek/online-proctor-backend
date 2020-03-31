@@ -1,59 +1,68 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const QuestionSchema = new mongoose.Schema({
-  title: {
+const AnswerSchema = new mongoose.Schema({
+  questionId: {
+    type: String,
+  },
+  userId: {
     type: String
   },
-  type: {
-    type: String,
-    enum: [
-      'single',
-      'multiple',
-      'openAnswerWithCorrect',
-      'openAnswer',
-    ]
-  },
-  descrpition: {
+  userName: {
     type: String
   },
   answer: {
     type: String
   },
-  photoUrl: {
-    type: String 
+  mark: {
+    type: Number,
+    default: 0
+  }
+});
+
+
+const QuestionSchema = new mongoose.Schema({
+  question: {
+    type: String,
   },
-  videoUrl: {
-    type: String 
+  until: {
+    type: String
   },
-  timeToSolve: {
-    type: Number 
+  answers: {
+    type: Array
   },
 });
+
 
 const TestSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
+  },
+  isActive: {
+    type: Boolean,
+    required: true,
+    default: true
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
-  tries: {
-    type: Number
+  timeToAnswer: {
+    type: Number,
   },
-  amount: {
-    type: Number
+  createdBy: {
+    type: String,
   },
-  results: [],
   questions: {
+    type: Array,
+  }, 
+  participants: {
     type: Array
-  },
-  
+  }
 });
 
-
 module.exports = {
-  Test: mongoose.model('Test', TestSchema),
-  Question: mongoose.model('Question', QuestionSchema),
-}
+  Test: mongoose.model("Test", TestSchema),
+  Question: mongoose.model("Question", QuestionSchema),
+  Answer: mongoose.model("Answer", AnswerSchema),
+};

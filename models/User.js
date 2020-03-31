@@ -56,6 +56,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  tabId: {
+    type: String
+  },
   date: {
     type: Date,
     default: Date.now
