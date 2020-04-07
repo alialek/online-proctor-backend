@@ -131,7 +131,7 @@ router.post("/:id", isAuthor, async (req, res) => {
             id: questions._id,
             type: "question",
             question: questions.question,
-            until: question.until - 5,
+            until: questions.until - 5,
           }),
         );
       }
