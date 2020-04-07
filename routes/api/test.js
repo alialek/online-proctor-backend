@@ -90,7 +90,7 @@ router.get("/:id", isAuthor, async (req, res) => {
 //@access  Автор
 
 router.put("/:id_test/:id_question", isAuthor, async (req, res) => {
-  let id_question = parseInt(req.params.id_question);
+  let id_question = req.params.id_question
 
   try {
     let question = await Question.findById(id_question);
@@ -107,13 +107,13 @@ router.put("/:id_test/:id_question", isAuthor, async (req, res) => {
 
 router.post("/:id", isAuthor, async (req, res) => {
   let idTest = req.params.id;
-  const errors = validationResult(req);
   let test = await Test.findById(idTest);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
   if (req.query.stop) {
     test.isActive = false;
+    for (var key in req.app.wssUsers[idTest]) {
+      req.app.wssUsers[idTest][key].send(JSON.stringify({ type: "stop" }));
+    }
+    delete req.app.wssUsers[idTest];
     let saved = await test.save();
     res.json(saved);
   } else {
@@ -125,9 +125,15 @@ router.post("/:id", isAuthor, async (req, res) => {
       });
 
       test.questions.push(questions);
-      console.log(test);
       for (var key in req.app.wssUsers[idTest]) {
-        req.app.wssUsers[idTest][key].send(JSON.stringify({question: questions.question, until:question.until - 5}));
+        req.app.wssUsers[idTest][key].send(
+          JSON.stringify({
+            id: questions._id,
+            type: "question",
+            question: questions.question,
+            until: question.until - 5,
+          }),
+        );
       }
 
       res.json(questions);
@@ -206,10 +212,9 @@ router.put("/:id/:question", auth, async (req, res) => {
 
 router.post("/register/:id", auth, async (req, res) => {
   try {
-
     let test = await Test.findOne({ _id: req.params.id });
     let user = await User.findOne({ _id: req.user.id });
-    console.log('check for test')
+    console.log("check for test");
     let newParticipant = {
       userId: req.user.id,
       answers: [],
