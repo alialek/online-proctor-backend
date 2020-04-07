@@ -12,9 +12,10 @@ function heartbeat() {
   this.isAlive = true;
 }
 
-// WebSocket-сервер на порту 3090
+console.log(server)
+
 var wss = new WebSocketServer.Server({
-  port: 3090,
+  server
 });
 wss.on("connection", async function(ws, req, kek) {
   ws.isAlive = true;
