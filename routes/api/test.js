@@ -200,34 +200,50 @@ router.put("/:id/:question", auth, async (req, res) => {
   }
 });
 
-//@route   POST api/quest/:id
-//@desc    Register user in game (just add quest to profile)
+//@route   POST api/test/register/:id
+//@desc    Добавить пользователя в тест
 //@access  Authenticated (user)
 
-router.post("/:id", auth, async (req, res) => {
+router.post("/register/:id", auth, async (req, res) => {
   try {
     let id = parseInt(req.params.id);
 
-    let quest = await Quest.findOne({ _id: id });
+    let test = await Test.findOne({ _id: id });
+    let user = await User.findOne({ _id: req.user.id });
 
-    let userID = req.user.id;
-    let user = await User.findOne({ _id: userID });
-    console.log(user);
-    quests = {
-      id: id,
-      riddles: [
-        {
-          id: 0,
-        },
-      ],
+    let newParticipant = {
+      userId: req.user.id,
+      answers: [],
     };
-    quest.registered.push(userID);
-    user.quests.push(quests);
-    await user.save();
-    quest.save().then(data => {
-      console.log(data.registered);
-    });
-    res.json(user);
+    let isParticipantRegistered = test.participants.filter(
+      (participant) => participant.id == req.user.id,
+    );
+    if (isParticipantRegistered.length == 0) {
+      test.participants.push(userID);
+      test.save().then((res) => {
+        res.status(200).json({
+          status: "success",
+          message: "Вы успешно добавлены в текст",
+          test: {
+            title: res.title,
+            description: res.description,
+            timeToAnswer: res.timeToAnswer,
+            id: res._id,
+          },
+        });
+      });
+    } else {
+      res.status(302).json({
+        status: "found",
+        message: "Вы уже были зарегистрированы ранее",
+        test: {
+          title: res.title,
+          description: res.description,
+          timeToAnswer: res.timeToAnswer,
+          id: res._id,
+        },
+      });
+    }
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -245,18 +261,18 @@ router.post("/:id_quest/:id_riddle", auth, async (req, res) => {
   //Получаем количество решенных загадок у пользователя в данном квесте
   let userID = req.user.id;
   let user = await User.findOne({ _id: userID });
-  let userRiddles = user.quests.filter(quest => quest.id === id_quest);
+  let userRiddles = user.quests.filter((quest) => quest.id === id_quest);
 
   let quest = await Quest.findOne({ _id: id_quest }).select("riddles");
-  let riddle = quest.riddles.filter(riddle => riddle.num == id_riddle)[0];
+  let riddle = quest.riddles.filter((riddle) => riddle.num == id_riddle)[0];
   let riddleIsRequired = riddle.required;
-  let solved = userRiddles[0].riddles.map(riddle => {
+  let solved = userRiddles[0].riddles.map((riddle) => {
     return riddle.id;
   });
   //Проверим, может, загадка уже решена, тогда принимаем любой ответ
-  let alreadyAnswered = solved.filter(x => x == id_riddle);
+  let alreadyAnswered = solved.filter((x) => x == id_riddle);
   //Функция для сравнения, есть ли в solved все ID из riddle.requires
-  let intersection = riddle.requires.filter(x => solved.includes(x));
+  let intersection = riddle.requires.filter((x) => solved.includes(x));
   //Уже отвечено?
   if (alreadyAnswered.length !== 0) {
     return res.json({ success: true });
@@ -287,7 +303,7 @@ router.post("/:id_quest/:id_riddle", auth, async (req, res) => {
                 "quests.$.lastAnswer": userAnswer,
               },
             },
-            function(err, docs) {
+            function (err, docs) {
               res.json({ success: true });
             },
           );
@@ -307,7 +323,7 @@ router.post("/:id_quest/:id_riddle", auth, async (req, res) => {
         User.updateOne(
           { _id: userID, "quests.id": id_quest },
           { $push: { "quests.$.riddles": riddle } },
-          function(err, docs) {
+          function (err, docs) {
             res.json({ success: true });
           },
         );
