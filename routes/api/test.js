@@ -206,11 +206,10 @@ router.put("/:id/:question", auth, async (req, res) => {
 
 router.post("/register/:id", auth, async (req, res) => {
   try {
-    let id = parseInt(req.params.id);
 
-    let test = await Test.findOne({ _id: id });
+    let test = await Test.findOne({ _id: req.params.id });
     let user = await User.findOne({ _id: req.user.id });
-
+    console.log('check for test')
     let newParticipant = {
       userId: req.user.id,
       answers: [],
