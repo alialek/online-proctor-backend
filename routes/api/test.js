@@ -218,7 +218,7 @@ router.post("/register/:id", auth, async (req, res) => {
       (participant) => participant.id == req.user.id,
     );
     if (isParticipantRegistered.length == 0) {
-      test.participants.push(userID);
+      test.participants.push(newParticipant);
       test.save().then((res) => {
         res.status(200).json({
           status: "success",
