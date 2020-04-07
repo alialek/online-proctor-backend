@@ -12,12 +12,13 @@ function heartbeat() {
   this.isAlive = true;
 }
 
-// WebSocket-сервер на порту 8081
+// WebSocket-сервер на порту 3090
 var wss = new WebSocketServer.Server({
   port: 3090,
 });
 wss.on("connection", async function(ws, req, kek) {
   ws.isAlive = true;
+  console.log('Trying to open Socket')
   ws.on("pong", heartbeat);
   let testId = req.url.split("=")[1];
   let token = req.headers.cookie.split("token=")[1].split(";")[0];

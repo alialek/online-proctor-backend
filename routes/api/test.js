@@ -227,7 +227,7 @@ router.post("/register/:id", auth, async (req, res) => {
       test.save().then((data) => {
         res.status(200).json({
           status: "success",
-          message: "Вы успешно добавлены в текст",
+          message: "Вы успешно добавлены в тест",
           test: {
             title: data.title,
             description: data.description,
