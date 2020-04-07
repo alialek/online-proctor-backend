@@ -108,26 +108,34 @@ router.put("/:id_test/:id_question", isAuthor, async (req, res) => {
 router.post("/:id", isAuthor, async (req, res) => {
   let idTest = req.params.id;
   const errors = validationResult(req);
+  let test = await Test.findById(idTest);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  if (req.query.stop)
+  if (req.query.stop) {
+    test.isActive = false;
+    let saved = await test.save();
+    res.json(saved);
+  } else {
     try {
-      let test = await Test.findById(idTest);
       let questions = await Question.create({
         question: req.body.question,
         answers: [],
         until: Math.floor(Date.now() / 1000) + test.timeToAnswer + 5,
       });
 
-      test.questions.push(...questions);
-      const newTest = await test.save();
+      test.questions.push(questions);
+      console.log(test);
+      for (var key in req.app.wssUsers[idTest]) {
+        req.app.wssUsers[idTest][key].send(req.body.question);
+      }
 
       res.json(questions);
     } catch (err) {
       console.error(err.message);
       res.status(500).send("Server error");
     }
+  }
 });
 
 //@route   PUT api/test/:id/:question
@@ -176,6 +184,8 @@ router.put("/:id/:question", auth, async (req, res) => {
         userId: req.user.id,
         mark: 0,
       });
+
+      req.wss.send();
 
       await question.answer.push(newAnswer);
       res.status(200).json({ status: "success", message: "Ответ сохранен" });
