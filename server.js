@@ -10,7 +10,6 @@ const WebSocketServer = new require("ws");
 const { User } = require("./models/User");
 const { Test, Question, Answer } = require("./models/Test");
 
-
 connectDB();
 app.use(cors());
 app.use(bodyParser());
@@ -52,6 +51,8 @@ wss.on("connection", async function (ws, req, kek) {
   console.log("Trying to open Socket");
   ws.on("pong", heartbeat);
   let testId = req.url.split("=")[1];
+  console.log(req.headers.cookie);
+  console.log(req.headers.cookie.split("token=")[1]);
   let token = req.headers.cookie.split("token=")[1].split(";")[0];
 
   try {
