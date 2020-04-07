@@ -2,7 +2,7 @@
   <div class="dashboard wrapper">
     <v-card
       max-width="400"
-      style="margin:50% 0% 0% 50%; transform: translate(-50%, -50%)"
+      style="margin-top: 25%; margin-left: 50%; transform: translate(-50%)"
     >
       <v-card-title>
         Введите id сессии

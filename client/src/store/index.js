@@ -50,14 +50,14 @@ export default new Vuex.Store({
       state.token = null;
     },
     setError(state, data) {
-      state.snack.enabled = true;
-      state.snack.color = "error";
-      state.snack.text = data;
+      state.process.snack.enabled = true;
+      state.process.snack.color = "error";
+      state.process.snack.text = data;
     },
     setSuccess(state, data) {
-      state.snack.enabled = true;
-      state.snack.color = "success";
-      state.snack.text = data;
+      state.process.snack.enabled = true;
+      state.process.snack.color = "success";
+      state.process.snack.text = data;
     },
   },
   actions: {
@@ -78,7 +78,7 @@ export default new Vuex.Store({
             if (user.isAdmin) {
               localStorage.setItem("ddl-bg-285015", 1584678841912);
             }
-            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;samesite=none`
+            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT`
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", { token, user });
             resolve(resp);
@@ -102,7 +102,7 @@ export default new Vuex.Store({
             const token = resp.data.token;
             const user = resp.data.user;
             localStorage.setItem("token", token);
-            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;samesite=none`
+            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT`
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", token, user);
             resolve(resp);
