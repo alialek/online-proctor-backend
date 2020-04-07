@@ -4,7 +4,7 @@ import router from './router'
 
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5000/api/',
+  baseURL: 'https://app.netquest.ru/api/',
   timeout: 30000,
 
 })
