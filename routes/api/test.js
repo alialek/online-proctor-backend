@@ -127,7 +127,7 @@ router.post("/:id", isAuthor, async (req, res) => {
       test.questions.push(questions);
       console.log(test);
       for (var key in req.app.wssUsers[idTest]) {
-        req.app.wssUsers[idTest][key].send(req.body.question);
+        req.app.wssUsers[idTest][key].send(JSON.stringify({question: questions.question, until:question.until - 5}));
       }
 
       res.json(questions);
@@ -219,15 +219,15 @@ router.post("/register/:id", auth, async (req, res) => {
     );
     if (isParticipantRegistered.length == 0) {
       test.participants.push(newParticipant);
-      test.save().then((res) => {
+      test.save().then((data) => {
         res.status(200).json({
           status: "success",
           message: "Вы успешно добавлены в текст",
           test: {
-            title: res.title,
-            description: res.description,
-            timeToAnswer: res.timeToAnswer,
-            id: res._id,
+            title: data.title,
+            description: data.description,
+            timeToAnswer: data.timeToAnswer,
+            id: data._id,
           },
         });
       });
@@ -236,10 +236,10 @@ router.post("/register/:id", auth, async (req, res) => {
         status: "found",
         message: "Вы уже были зарегистрированы ранее",
         test: {
-          title: res.title,
-          description: res.description,
-          timeToAnswer: res.timeToAnswer,
-          id: res._id,
+          title: test.title,
+          description: test.description,
+          timeToAnswer: test.timeToAnswer,
+          id: test._id,
         },
       });
     }
