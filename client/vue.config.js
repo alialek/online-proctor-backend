@@ -1,5 +1,9 @@
 module.exports = {
-  devServer: {
-    https: true
+  css: {
+    loaderOptions: {
+      sass: {
+        data: `@import "@/styles/main.scss";`
+      }
+    }
   }
 };

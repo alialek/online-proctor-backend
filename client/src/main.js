@@ -1,33 +1,23 @@
-import Vue from 'vue';
-import App from './App.vue';
-import router from './router';
-import store from './store';
-import Vuetify from 'vuetify/lib';
-import 'vuetify/dist/vuetify.min.css';
-import axios from 'axios';
-import VueGeolocation from 'vue-browser-geolocation';
-import LoadScript from 'vue-plugin-load-script';
-import 'vuetify/src/stylus/app.styl';
-import '@mdi/font/css/materialdesignicons.css';
+import Vue from 'vue'
+import Vuesax from 'vuesax'
+import App from './App.vue'
+import router from './router'
+import store from './store'
 
-Vue.use(Vuetify, {
-  icons: {
-    iconfont: 'mdi'
-  }
-});
+import 'vuesax/dist/vuesax.css'
+import vuetify from './plugins/vuetify';
+import '@babel/polyfill'
 
-Vue.use(LoadScript);
-Vue.use(VueGeolocation);
 
-axios.defaults.headers.common['Content-Type'] = 'application/json';
+Vue.use(Vuesax, {
 
-Vue.use(Vuetify);
+})
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = false
 
 new Vue({
   router,
   store,
-  Vuetify,
+  vuetify,
   render: h => h(App)
-}).$mount('#app');
+}).$mount('#app')

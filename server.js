@@ -51,7 +51,6 @@ wss.on("connection", async function (ws, req, kek) {
   console.log("Trying to open Socket");
   ws.on("pong", heartbeat);
   let testId = req.url.split("=")[1];
-  console.log(ws.headers);
   console.log(req.headers);
   let token = req.headers.cookie.split("token=")[1].split(";")[0];
 

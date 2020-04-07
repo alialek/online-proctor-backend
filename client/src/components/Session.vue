@@ -1,0 +1,113 @@
+<template>
+  <v-row
+    class="justify-center align-center"
+    style="height: 100vh; width: 100vw; overflow: hidden; background-color: #E8F5E9;"
+  >
+    <v-card v-if="newQuestion">
+      <v-card-title>{{ question.question }}</v-card-title>
+      <v-card-text>
+        <v-form @submit="sendAnswer">
+          <v-text-field v-model="answer" label="Введите ответ" outlined>
+          </v-text-field>
+          <v-btn type="submit" color="success" depressed
+            >Ответить</v-btn
+          ></v-form
+        >
+      </v-card-text>
+    </v-card>
+    <v-card v-if="stop">
+      <v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
+    </v-card>
+    <v-card v-if="startMessage">
+      <v-card-title>{{ tests.title }}</v-card-title>
+      <v-card-text>{{ tests.description }}</v-card-text>
+      <v-card-actions
+        >Время ответа на один вопрос: {{ tests.timeToAnswer }}c.</v-card-actions
+      >
+    </v-card>
+    <v-card v-else>
+      <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
+    </v-card>
+  </v-row>
+</template>
+
+<script>
+  export default {
+    props: {
+      id: {
+        required: true,
+        type: String,
+      },
+    },
+    computed: {
+      test() {
+        return this.$store.state.userTest;
+      },
+    },
+    methods: {
+      sendAnswer() {
+        this.$store
+          .dispatch("sendAnswer", {
+            id: this.id,
+            questionId: this.question.id,
+            answer: this.answer,
+          })
+          .then((res) => {
+            if (res.status == 200) {
+              this.newQuestion = false;
+              this.answer = "";
+              this.question = {};
+            }
+          });
+      },
+      startSocket() {
+        var socket = new WebSocket("ws://app.netquest.ru/?id=" + this.id);
+        socket.onopen = function() {
+          this.$store.commit("setSuccess", "Соединение установлено");
+        };
+
+        socket.onclose = function(event) {
+          if (event.wasClean) {
+            this.$store.commit("setSuccess", "Соединение закрыто");
+          } else {
+            this.$store.commit("setSuccess", "Соединение оборвалось");
+          }
+          console.log("Код: " + event.code + " причина: " + event.reason);
+        };
+
+        socket.onmessage = function(event) {
+          let data = JSON.parse(event.data);
+          if (data.type == "question") {
+            this.question = true;
+          } else if (data.type == "stop") {
+            this.stop = true;
+          }
+        };
+        socket.onerror = function(error) {
+          this.$store.commit("setSuccess", "Ошибка " + error.message);
+        };
+      },
+    },
+    mounted() {
+      this.$store.dispatch("registerUserInTest", this.id).then((res) => {
+        if (res.status == 200 || res.status == 302) {
+          this.startSocket();
+          this.startMessage = true;
+          this.tests = res.data;
+        }
+      });
+    },
+    data() {
+      return {
+        startMessage: false,
+        newQuestion: false,
+        stop: false,
+        answer: "",
+        question: {},
+        tests: {},
+      };
+    },
+  };
+</script>
+
+<style></style>
