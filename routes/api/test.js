@@ -89,7 +89,7 @@ router.get("/:id", isAuthor, async (req, res) => {
 //@desc    Посмотреть ответы на определенный вопрос
 //@access  Автор
 
-router.put("/:id_test/:id_question", isAuthor, async (req, res) => {
+router.get("/:id_test/:id_question", isAuthor, async (req, res) => {
   let id_question = req.params.id_question
 
   try {
