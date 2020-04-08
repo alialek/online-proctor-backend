@@ -89,7 +89,7 @@ router.get("/:id", isAuthor, async (req, res) => {
 //@desc    Посмотреть ответы на определенный вопрос
 //@access  Автор
 
-router.get("/:id_test/:id_question", isAuthor, async (req, res) => {
+router.get("/:id_test/:id_question", isAdmin, async (req, res) => {
   let id_question = req.params.id_question
 
   try {
@@ -183,6 +183,7 @@ router.put("/:id/:question", auth, async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
+    let test = await Test.findById(idTest);
     let question = await Question.findById(questionId);
     if (question.until > Math.floor(Date.now() / 1000)) {
       let newAnswer = await Answer.create({
@@ -192,8 +193,6 @@ router.put("/:id/:question", auth, async (req, res) => {
         userId: req.user.id,
         mark: 0,
       });
-
-      req.wss.send();
 
       await question.answer.push(newAnswer);
       res.status(200).json({ status: "success", message: "Ответ сохранен" });
