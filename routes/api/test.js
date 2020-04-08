@@ -136,6 +136,8 @@ router.post("/:id", isAuthor, async (req, res) => {
         );
       }
 
+      await test.save()
+
       res.json(questions);
     } catch (err) {
       console.error(err.message);
