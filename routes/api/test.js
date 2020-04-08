@@ -194,7 +194,14 @@ router.put("/:id/:question", auth, async (req, res) => {
         mark: 0,
       });
 
-      await question.answer.push(newAnswer);
+      let index = test.participants.findIndex((obj => obj.userId == req.user.id));
+      console.log('Находим индекс участника', index)
+      test.participants[index].answers.push(newAnswer)
+      console.log('Сохраняем')
+      await test.save()
+
+      question.answer.push(newAnswer);
+      await question.save()
       res.status(200).json({ status: "success", message: "Ответ сохранен" });
     } else {
       res
