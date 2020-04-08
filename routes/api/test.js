@@ -196,13 +196,18 @@ router.put("/:id/:question", auth, async (req, res) => {
 
       let index = test.participants.findIndex((obj => obj.userId == req.user.id));
       console.log('Находим индекс участника', index)
-      test.participants[index].answers.push(newAnswer)
+      if(index >= 0 ) {
+        test.participants[index].answers.push(newAnswer)
       console.log('Сохраняем')
       await test.save()
 
       question.answer.push(newAnswer);
       await question.save()
       res.status(200).json({ status: "success", message: "Ответ сохранен" });
+      } else {
+        res.status(400).json({ status: "error", message: "Вы не зарегистрированы в тесте" });
+      }
+      
     } else {
       res
         .status(300)
