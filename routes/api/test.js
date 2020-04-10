@@ -106,6 +106,7 @@ router.get("/:id_test/:id_question", isAdmin, async (req, res) => {
 //@access  Автор
 
 router.post("/:id", isAuthor, async (req, res) => {
+  console.log('Отправка нового вопроса')
   let idTest = req.params.id;
   let test = await Test.findById(idTest);
   if (req.query.stop) {
@@ -186,7 +187,8 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
 //@desc    Отправить ответ
 //@access  Auth user
 
-router.post("/:id/:question", auth, async (req, res) => {
+router.post("/answer/:id/:question", auth, async (req, res) => {
+  console.log('f')
   let idTest = req.params.id;
   let questionId = req.params.question;
   let { answer } = req.body;
@@ -235,9 +237,9 @@ router.post("/:id/:question", auth, async (req, res) => {
 //@access  Authenticated (user)
 
 router.post("/register/:id", auth, async (req, res) => {
+  console.log(req.params)
   try {
     let test = await Test.findOne({ _id: req.params.id });
-    let user = await User.findOne({ _id: req.user.id });
     console.log("check for test");
     let newParticipant = {
       userId: req.user.id,
