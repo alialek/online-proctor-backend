@@ -262,7 +262,7 @@ router.post("/register/:id", auth, async (req, res) => {
         });
       });
     } else {
-      res.status(302).json({
+      res.status(200).json({
         status: "found",
         message: "Вы уже были зарегистрированы ранее",
         test: {
