@@ -59,6 +59,9 @@ const UserSchema = new mongoose.Schema({
   tabId: {
     type: String
   },
+  group: {
+    type: String
+  },
   date: {
     type: Date,
     default: Date.now

@@ -28,7 +28,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, tabId } = req.body;
+    const { name, email, password, tabId, group } = req.body;
 
     try {
       // Проверка на уникальность пользователя
@@ -43,7 +43,7 @@ router.post(
       user = new User({
         name,
         email,
-        password, tabId
+        password, tabId, group
       });
 
       const salt = await bcrypt.genSalt(10);
