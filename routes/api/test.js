@@ -182,11 +182,11 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
   }
 });
 
-//@route   PUT api/test/:id/:question
+//@route   POST api/test/:id/:question
 //@desc    Отправить ответ
 //@access  Auth user
 
-router.put("/:id/:question", auth, async (req, res) => {
+router.post("/:id/:question", auth, async (req, res) => {
   let idTest = req.params.id;
   let questionId = req.params.question;
   let { answer } = req.body;

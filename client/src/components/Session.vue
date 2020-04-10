@@ -15,7 +15,7 @@
         >
       </v-card-text>
     </v-card>
-    <v-card v-if="!newQuestion">
+    <v-card v-if="!noQuestion">
       <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
     </v-card>
     <v-card v-if="stop">
@@ -48,6 +48,7 @@
       reset() {
         this.startMessage = false;
         this.newQuestion = false;
+        this.noQuestion = false;
         this.stop = false;
       },
       sendAnswer() {
@@ -111,6 +112,7 @@
       return {
         startMessage: false,
         newQuestion: false,
+        noQuestion: false,
         stop: false,
         answer: "",
         question: {},

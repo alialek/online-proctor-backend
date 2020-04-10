@@ -222,7 +222,7 @@ export default new Vuex.Store({
     },
     sendAnswer({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        axios.put(`/test/${payload.id}/${payload.questionId}`, { answer: payload.answer })
+        axios.post(`/test/${payload.id}/${payload.questionId}`, { answer: payload.answer })
           .then(resp => {
             resolve(resp)
             if (resp.status == 200) {
