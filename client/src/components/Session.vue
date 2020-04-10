@@ -2,7 +2,7 @@
   <v-row
     class="justify-center align-center"
     style="height: 100vh; width: 100vw; overflow: hidden; background-color: #E8F5E9;"
-  >
+  ><v-col xs=12 md=6 lg=6>
     <v-card v-if="newQuestion">
       <v-card-title>{{ question.question }}</v-card-title>
       <v-card-text>
@@ -28,6 +28,7 @@
         >Время ответа на один вопрос: {{ tests.timeToAnswer }}c.</v-card-actions
       >
     </v-card>
+    </v-col>
   </v-row>
 </template>
 

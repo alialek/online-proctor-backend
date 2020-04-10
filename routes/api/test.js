@@ -65,12 +65,14 @@ router.get("/", isAdmin, async (req, res) => {
 
 router.get("/:id", isAuthor, async (req, res) => {
   let id = req.params.id;
-  let stop = req.query.id;
+  let stop = req.query.stop;
   let test = await Test.findById(id);
+  
   try {
     if (stop) {
       test.isActive = false;
-      res.json(await test.save());
+      await test.save()
+      res.status(200).json({status: 'success', message: 'Сессия остановлена'});
     } else {
       let user = await User.findById(req.user.id);
       if (user.tests.indexOf(id) >= 0) {
@@ -191,6 +193,7 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
   console.log('f')
   let idTest = req.params.id;
   let questionId = req.params.question;
+  let userName = await User.findById(req.user.id).select('name');
   let { answer } = req.body;
   try {
     let test = await Test.findById(idTest);
@@ -199,7 +202,7 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
       let newAnswer = await Answer.create({
         answer,
         questionId,
-        userName: req.user.name,
+        userName,
         userId: req.user.id,
         mark: 0,
       });
