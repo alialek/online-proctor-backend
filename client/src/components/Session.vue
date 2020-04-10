@@ -80,7 +80,8 @@
           console.log(event)
           console.log(data)
           if (data.type == "question") {
-            this.question = true;
+            this.newQuestion = true;
+            this.question = data
           } else if (data.type == "stop") {
             this.stop = true;
           }
