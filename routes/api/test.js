@@ -213,7 +213,7 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
         console.log("Сохраняем");
         await test.save();
 
-        question.answer.push(newAnswer);
+        question.answers.push(newAnswer);
         await question.save();
         res.status(200).json({ status: "success", message: "Ответ сохранен" });
       } else {
