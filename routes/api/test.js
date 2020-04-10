@@ -247,10 +247,10 @@ router.post("/register/:id", auth, async (req, res) => {
       userId: req.user.id,
       answers: [],
     };
-    let isParticipantRegistered = test.participants.filter(
-      (participant) => participant.id == req.user.id,
+    let isParticipantRegistered = test.participants.findIndex(
+      (obj) => obj.userId == req.user.id,
     );
-    if (isParticipantRegistered.length == 0) {
+    if (isParticipantRegistered >= 0) {
       test.participants.push(newParticipant);
       test.save().then((data) => {
         res.status(200).json({

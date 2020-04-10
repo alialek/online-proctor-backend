@@ -8,6 +8,10 @@
 			style="height: 85vh"
 		>
 			<v-toolbar flat>
+				<v-col>
+					<v-row></v-row>
+					<v-row>Ссылка: https://app.netquest.ru/session/?id={{session._id}}</v-row>
+				</v-col>
 				<v-toolbar-title class="">{{ session.title }}</v-toolbar-title>
 				<v-spacer></v-spacer>
 				<h2 class="subtitle-2">

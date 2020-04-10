@@ -61,7 +61,7 @@
           });
       },
       startSocket() {
-        var socket = new WebSocket("ws://app.netquest.ru/?id=" + this.id);
+        var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
         socket.onopen = function() {
           this.$store.commit("setSuccess", "Соединение установлено");
         };
