@@ -6,7 +6,7 @@
     <v-card v-if="newQuestion">
       <v-card-title>{{ question.question }}</v-card-title>
       <v-card-text>
-        <v-form @submit="sendAnswer">
+        <v-form @submit.prevent="sendAnswer">
           <v-text-field v-model="answer" label="Введите ответ" outlined>
           </v-text-field>
           <v-btn type="submit" color="success" depressed
@@ -14,6 +14,9 @@
           ></v-form
         >
       </v-card-text>
+    </v-card>
+     <v-card v-if="!newQuestion">
+      <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
     </v-card>
     <v-card v-if="stop">
       <v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
@@ -25,9 +28,7 @@
         >Время ответа на один вопрос: {{ tests.timeToAnswer }}c.</v-card-actions
       >
     </v-card>
-    <v-card v-else>
-      <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
-    </v-card>
+   
   </v-row>
 </template>
 

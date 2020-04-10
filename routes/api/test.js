@@ -189,11 +189,7 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
 router.put("/:id/:question", auth, async (req, res) => {
   let idTest = req.params.id;
   let questionId = req.params.question;
-  const errors = validationResult(req);
   let { answer } = req.body;
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
   try {
     let test = await Test.findById(idTest);
     let question = await Question.findById(questionId);
@@ -247,6 +243,7 @@ router.post("/register/:id", auth, async (req, res) => {
       userId: req.user.id,
       answers: [],
     };
+    console.log(test.participants[0].userId, req.user.id);
     let isParticipantRegistered = test.participants.findIndex(
       (obj) => obj.userId == req.user.id,
     );
