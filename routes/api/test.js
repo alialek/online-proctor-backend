@@ -90,7 +90,7 @@ router.get("/:id", isAuthor, async (req, res) => {
 //@access  Автор
 
 router.get("/:id_test/:id_question", isAdmin, async (req, res) => {
-  let id_question = req.params.id_question
+  let id_question = req.params.id_question;
 
   try {
     let question = await Question.findById(id_question);
@@ -136,7 +136,7 @@ router.post("/:id", isAuthor, async (req, res) => {
         );
       }
 
-      await test.save()
+      await test.save();
 
       res.json(questions);
     } catch (err) {
@@ -154,16 +154,28 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
   let idTest = req.params.id;
   let idQuestion = req.params.question;
   const errors = validationResult(req);
-  let { answer } = req.body;
+  let { id, mark } = req.body;
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    let answer = await Answer.findById(req.body.id);
-    answer.mark = req.body.mark;
+    let answer = await Answer.findById(id);
+    let test = await Test.findById(idTest);
+    answer.mark = mark;
     let result = await answer.save();
-
-    res.json(result);
+    let index = test.participants.findIndex(
+      (obj) => obj.userId == answer.userId,
+    );
+    if (index > 0) {
+      let aIndex = test.participants[index].answers.findIndex(
+        (obj) => obj._id == answer._id,
+      );
+      test.participants[index].answers[aIndex] = result;
+      await test.save();
+      res.json(result);
+    } else {
+      res.status(404).json({ status: "error", message: "Участник не найден" });
+    }
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -194,20 +206,23 @@ router.put("/:id/:question", auth, async (req, res) => {
         mark: 0,
       });
 
-      let index = test.participants.findIndex((obj => obj.userId == req.user.id));
-      console.log('Находим индекс участника', index)
-      if(index >= 0 ) {
-        test.participants[index].answers.push(newAnswer)
-      console.log('Сохраняем')
-      await test.save()
+      let index = test.participants.findIndex(
+        (obj) => obj.userId == req.user.id,
+      );
+      console.log("Находим индекс участника", index);
+      if (index >= 0) {
+        test.participants[index].answers.push(newAnswer);
+        console.log("Сохраняем");
+        await test.save();
 
-      question.answer.push(newAnswer);
-      await question.save()
-      res.status(200).json({ status: "success", message: "Ответ сохранен" });
+        question.answer.push(newAnswer);
+        await question.save();
+        res.status(200).json({ status: "success", message: "Ответ сохранен" });
       } else {
-        res.status(400).json({ status: "error", message: "Вы не зарегистрированы в тесте" });
+        res
+          .status(400)
+          .json({ status: "error", message: "Вы не зарегистрированы в тесте" });
       }
-      
     } else {
       res
         .status(300)
