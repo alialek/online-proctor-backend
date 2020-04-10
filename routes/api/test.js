@@ -247,7 +247,7 @@ router.post("/register/:id", auth, async (req, res) => {
     let isParticipantRegistered = test.participants.findIndex(
       (obj) => obj.userId == req.user.id,
     );
-    if (isParticipantRegistered >= 0) {
+    if (isParticipantRegistered == -1) {
       test.participants.push(newParticipant);
       test.save().then((data) => {
         res.status(200).json({
@@ -278,119 +278,4 @@ router.post("/register/:id", auth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-//@route   POST api/quest/:id_quest/:id_riddle
-//@desc    POST an answer
-//@access  Private
-//@todo    Запилить проверку уровня, чтобы пользователь не мог отправлять post, если не решил загадку ранее DONE
-
-router.post("/:id_quest/:id_riddle", auth, async (req, res) => {
-  let id_quest = parseInt(req.params.id_quest);
-  let id_riddle = parseInt(req.params.id_riddle);
-  //Получаем количество решенных загадок у пользователя в данном квесте
-  let userID = req.user.id;
-  let user = await User.findOne({ _id: userID });
-  let userRiddles = user.quests.filter((quest) => quest.id === id_quest);
-
-  let quest = await Quest.findOne({ _id: id_quest }).select("riddles");
-  let riddle = quest.riddles.filter((riddle) => riddle.num == id_riddle)[0];
-  let riddleIsRequired = riddle.required;
-  let solved = userRiddles[0].riddles.map((riddle) => {
-    return riddle.id;
-  });
-  //Проверим, может, загадка уже решена, тогда принимаем любой ответ
-  let alreadyAnswered = solved.filter((x) => x == id_riddle);
-  //Функция для сравнения, есть ли в solved все ID из riddle.requires
-  let intersection = riddle.requires.filter((x) => solved.includes(x));
-  //Уже отвечено?
-  if (alreadyAnswered.length !== 0) {
-    return res.json({ success: true });
-  } else {
-    if (riddleIsRequired) {
-      let userAnswer = req.body.answer;
-      if (typeof userAnswer === "string") {
-        userAnswer = userAnswer.toLowerCase();
-      }
-      try {
-        let riddleAnswer = riddle.answer;
-        if (typeof riddleAnswer === "string") {
-          riddleAnswer = riddleAnswer.toLowerCase();
-        }
-        console.log(intersection.length, riddle.requires.length);
-        if (
-          riddleAnswer == userAnswer &&
-          intersection.length == riddle.requires.length
-        ) {
-          riddle = {
-            id: riddle.num,
-          };
-          User.updateOne(
-            { _id: userID, "quests.id": id_quest },
-            {
-              $push: {
-                "quests.$.riddles": riddle,
-                "quests.$.lastAnswer": userAnswer,
-              },
-            },
-            function (err, docs) {
-              res.json({ success: true });
-            },
-          );
-        } else {
-          res.json({ success: false });
-        }
-      } catch (err) {
-        console.error(err.message);
-        res.status(500).json("Проблема на сервере");
-      }
-    } else {
-      console.log("notRequired");
-      try {
-        riddle = {
-          id: riddle.num,
-        };
-        User.updateOne(
-          { _id: userID, "quests.id": id_quest },
-          { $push: { "quests.$.riddles": riddle } },
-          function (err, docs) {
-            res.json({ success: true });
-          },
-        );
-      } catch (error) {
-        console.error(err.message);
-        res.status(500).json("Проблема на сервере");
-      }
-    }
-  }
-});
-
 module.exports = router;
-
-// //@route   PUT api/test/id
-// //@desc    Обновление теста
-// //@access  Authenticated, isAdmin
-
-// router.put("/:id", isAdmin, async (req, res) => {
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return res.status(400).json({ errors: errors.array() });
-//   }
-//   try {
-//     let test = await Test.findOne({ _id: id });
-//     let user = await User.findById(req.user.id);
-//     if (user.test.find(test_id => test_id == id)) {
-//       (test.title = req.body.title),
-//         (test.description = req.body.description),
-//         (test.tries = req.body.tries),
-//         (test.amount = req.body.amount);
-//       const newTest = await test.save();
-//       let { title, description, tries, amount } = newTest;
-//       return res.json({ title, description, tries, amount });
-//     } else {
-//       return res.status(401).json({ status: "error", msg: "Нет прав" });
-//     }
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send("Server error");
-//   }
-// });

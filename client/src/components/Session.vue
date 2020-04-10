@@ -15,7 +15,7 @@
         >
       </v-card-text>
     </v-card>
-     <v-card v-if="!newQuestion">
+    <v-card v-if="!newQuestion">
       <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
     </v-card>
     <v-card v-if="stop">
@@ -28,7 +28,6 @@
         >Время ответа на один вопрос: {{ tests.timeToAnswer }}c.</v-card-actions
       >
     </v-card>
-   
   </v-row>
 </template>
 
@@ -37,25 +36,30 @@
     props: {
       id: {
         required: true,
-        type: String,
-      },
+        type: String
+      }
     },
     computed: {
       test() {
         return this.$store.state.userTest;
-      },
+      }
     },
     methods: {
+      reset() {
+        this.startMessage = false;
+        this.newQuestion = false;
+        this.stop = false;
+      },
       sendAnswer() {
         this.$store
           .dispatch("sendAnswer", {
             id: this.id,
             questionId: this.question.id,
-            answer: this.answer,
+            answer: this.answer
           })
-          .then((res) => {
+          .then(res => {
             if (res.status == 200) {
-              this.newQuestion = false;
+             this.reset()
               this.answer = "";
               this.question = {};
             }
@@ -67,7 +71,7 @@
           this.$store.commit("setSuccess", "Соединение установлено");
         };
 
-        socket.onclose = (event) => {
+        socket.onclose = event => {
           if (event.wasClean) {
             this.$store.commit("setSuccess", "Соединение закрыто");
           } else {
@@ -76,28 +80,30 @@
           console.log("Код: " + event.code + " причина: " + event.reason);
         };
 
-        socket.onmessage = (event) => {
+        socket.onmessage = event => {
           let data = JSON.parse(event.data);
-          console.log(event)
-          console.log(data)
+          console.log(event);
+          console.log(data);
+          this.reset()
           if (data.type == "question") {
             this.newQuestion = true;
-            this.question = data
+            this.question = data;
           } else if (data.type == "stop") {
             this.stop = true;
           }
         };
-        socket.onerror = (error) => {
+        socket.onerror = error => {
           this.$store.commit("setSuccess", "Ошибка " + error.message);
         };
-      },
+      }
     },
     mounted() {
-      this.$store.dispatch("registerUserInTest", this.id).then((res) => {
+      this.$store.dispatch("registerUserInTest", this.id).then(res => {
         if (res.status == 200 || res.status == 302) {
           this.startSocket();
+          this.reset()
           this.startMessage = true;
-          this.tests = res.data;
+          this.tests = res.data.test;
         }
       });
     },
@@ -108,9 +114,9 @@
         stop: false,
         answer: "",
         question: {},
-        tests: {},
+        tests: {}
       };
-    },
+    }
   };
 </script>
 
