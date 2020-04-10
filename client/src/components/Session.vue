@@ -62,11 +62,11 @@
       },
       startSocket() {
         var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
-        socket.onopen = function() {
+        socket.onopen = () => {
           this.$store.commit("setSuccess", "Соединение установлено");
         };
 
-        socket.onclose = function(event) {
+        socket.onclose = (event) => {
           if (event.wasClean) {
             this.$store.commit("setSuccess", "Соединение закрыто");
           } else {
@@ -75,15 +75,17 @@
           console.log("Код: " + event.code + " причина: " + event.reason);
         };
 
-        socket.onmessage = function(event) {
+        socket.onmessage = (event) => {
           let data = JSON.parse(event.data);
+          console.log(event)
+          console.log(data)
           if (data.type == "question") {
             this.question = true;
           } else if (data.type == "stop") {
             this.stop = true;
           }
         };
-        socket.onerror = function(error) {
+        socket.onerror = (error) => {
           this.$store.commit("setSuccess", "Ошибка " + error.message);
         };
       },
