@@ -1,18 +1,14 @@
 <template>
 	<div class="main">
-		<div class="admin wrapper">
-
+		<v-card class="wrapper">
 			<router-view></router-view>
-		</div>
+		</v-card>
 	</div>
 </template>
 
 <script>
-export default {
-
-};
+export default {};
 </script>
 
 <style>
-
 </style>

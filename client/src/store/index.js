@@ -42,23 +42,23 @@ export default new Vuex.Store({
       state.token = payload.token;
       state.user = payload.user;
     },
-    SET_ERROR(state) {
-      state.status = "error";
-    },
     LOGOUT(state) {
       state.status = "";
       state.token = null;
     },
-    setError(state, data) {
+    SET_ERROR(state, data) {
       state.process.snack.enabled = true;
       state.process.snack.color = "error";
       state.process.snack.text = data;
     },
-    setSuccess(state, data) {
+    SET_SUCCESS(state, data) {
       state.process.snack.enabled = true;
       state.process.snack.color = "success";
       state.process.snack.text = data;
     },
+    DISABLE_SESSION(state) {
+      state.activeSession = {};
+    }
   },
   actions: {
     login({ commit }, user) {
@@ -78,7 +78,7 @@ export default new Vuex.Store({
             if (user.isAdmin) {
               localStorage.setItem("ddl-bg-285015", 1584678841912);
             }
-            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT`
+            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;samesite=none;secure;`
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", { token, user });
             resolve(resp);
@@ -102,7 +102,7 @@ export default new Vuex.Store({
             const token = resp.data.token;
             const user = resp.data.user;
             localStorage.setItem("token", token);
-            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT`
+            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;samesite=none`
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", token, user);
             resolve(resp);
@@ -139,19 +139,22 @@ export default new Vuex.Store({
     //   })
     // },
     addSession({ commit }, payload) {
+
       return new Promise((resolve, reject) => {
         axios
           .post("/test", payload)
           .then((resp) => {
             commit("SET_SESSION", { session: resp.data });
+            commit("SET_SUCCESS", 'Сессия успешно создана')
             resolve(resp.data);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
       });
+
     },
 
     getSessions({ commit }) {
@@ -163,26 +166,44 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
       });
     },
-    getSession({ commit,state }, id) {
+    getSession({ commit }, id) {
       return new Promise((resolve, reject) => {
         axios
           .get("/test/" + id)
           .then((resp) => {
-           state.activeSession = resp.data 
+            commit("SET_SESSION", { session: resp.data });
             resolve(resp.data);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
       });
+    },
+    disableSession({ commit }, id) {
+      return new Promise((resolve, reject) => {
+        axios
+          .get(`/test/${id}?stop=true`)
+          .then((resp) => {
+            console.log(resp);
+            commit("DISABLE_SESSION")
+            resolve(resp.data);
+          })
+          .catch((err) => {
+            console.error(err);
+            commit("SET_ERROR", err);
+            reject(err);
+          });
+      })
+
+
     },
     registerUserInTest({ commit, state }, id) {
       return new Promise((resolve, reject) => {
@@ -193,7 +214,7 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -201,17 +222,17 @@ export default new Vuex.Store({
     },
     sendAnswer({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        axios.put(`/test/${payload.id}/${payload.questionId}`, {answer: payload.answer})
+        axios.put(`/test/${payload.id}/${payload.questionId}`, { answer: payload.answer })
           .then(resp => {
             resolve(resp)
-            if(resp.status == 200) {
-              commit('setSuccess', resp.data.message)
+            if (resp.status == 200) {
+              commit('SET_SUCCESS', resp.data.message)
             } else {
-              commit('setError', resp.data.message)
+              commit('SET_ERROR', resp.data.message)
             }
           })
           .catch(err => {
-            console.log(err);
+            console.error(err);
             commit('SET_ERROR', err)
             reject(err)
           })
@@ -219,17 +240,17 @@ export default new Vuex.Store({
     },
     sendQuestion({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        axios.post(`/test/${payload.id}`, {question: payload.question})
+        axios.post(`/test/${payload.id}`, { question: payload.question })
           .then(resp => {
             resolve(resp)
-            if(resp.status == 200) {
-              commit('setSuccess', 'Вопрос отправлен')
+            if (resp.status == 200) {
+              commit('SET_SUCCESS', 'Вопрос отправлен')
             } else {
-              commit('setError', resp.data)
+              commit('SET_ERROR', resp.data)
             }
           })
           .catch(err => {
-            console.log(err);
+            console.error(err);
             commit('SET_ERROR', err)
             reject(err)
           })
@@ -237,22 +258,36 @@ export default new Vuex.Store({
     },
     getQuestionAnswers({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        axios.get(`/test/${payload.testDd}/${payload.id}`)
+        axios.get(`/test/${payload.testId}/${payload.id}`)
           .then(resp => {
             resolve(resp)
-            if(resp.status == 200) {
-              commit('setSuccess', resp.data.message)
+            if (resp.status == 200) {
+              commit('SET_SUCCESS', resp.data.message)
             } else {
-              commit('setError', resp.data.message)
+              commit('SET_ERROR', resp.data.message)
             }
           })
           .catch(err => {
-            console.log(err);
+            console.error(err);
             commit('SET_ERROR', err)
             reject(err)
           })
       })
     },
+    rateAnswer({ commit }, payload) {
+      return new Promise((resolve, reject) => {
+        axios.put(`/test/${payload.id}/${payload.questionId}`)
+          .then(resp => {
+            resolve(resp)
+            commit('SET_SUCCESS', resp.data.message)
+          })
+          .catch(err => {
+            console.error(err);
+            commit('SET_ERROR', err)
+            reject(err)
+          })
+      })
+    }
   },
   getters: {
     isLoggedIn: state => state.token !== null,
@@ -268,5 +303,7 @@ export default new Vuex.Store({
       }
     },
     token: (state) => state.token,
+    session: (state) => state.session,
+    sessionActive: (state) => state.sessionActive
   },
 });

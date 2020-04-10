@@ -172,7 +172,7 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
       );
       test.participants[index].answers[aIndex] = result;
       await test.save();
-      res.json(result);
+      res.json({ status: "error", message: "Участник не найден", result });
     } else {
       res.status(404).json({ status: "error", message: "Участник не найден" });
     }
