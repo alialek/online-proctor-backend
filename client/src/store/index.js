@@ -67,7 +67,7 @@ export default new Vuex.Store({
 
       return new Promise((resolve, reject) => {
         axios({
-          url: "http://localhost:5000/api/auth",
+          url: "https://app.netquest.ru/api/auth",
           data: user,
           method: "POST"
         })
