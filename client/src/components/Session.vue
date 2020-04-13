@@ -100,7 +100,7 @@
         }
       },
       startSocket() {
-        var socket = new WebSocket("ws://localhost:5000/?id=" + this.id);
+        var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
         socket.onopen = () => {
           this.$store.commit("SET_SUCCESS", "Соединение установлено");
         };
