@@ -2,32 +2,42 @@
   <v-row
     class="justify-center align-center"
     style="height: 100vh; width: 100vw; overflow: hidden; background-color: #E8F5E9;"
-  ><v-col xs=12 md=6 lg=6>
-    <v-card v-if="newQuestion">
-      <v-card-title>{{ question.question }}</v-card-title>
-      <v-card-text>
-        <v-form @submit.prevent="sendAnswer">
-          <v-text-field v-model="answer" label="Введите ответ" outlined>
-          </v-text-field>
-          <v-btn type="submit" color="success" depressed
-            >Ответить</v-btn
-          ></v-form
+    ><v-col xs="12" md="6" lg="6">
+      <v-card v-if="newQuestion">
+        <v-progress-linear
+          :active="timer"
+          v-model="value"
+          stream
+          color="primary"
+          absolute
+          bottom
         >
-      </v-card-text>
-    </v-card>
-    <v-card v-if="noQuestion">
-      <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
-    </v-card>
-    <v-card v-if="stop">
-      <v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
-    </v-card>
-    <v-card v-if="startMessage">
-      <v-card-title>{{ tests.title }}</v-card-title>
-      <v-card-text>{{ tests.description }}</v-card-text>
-      <v-card-actions
-        >Время ответа на один вопрос: {{ tests.timeToAnswer }}c.</v-card-actions
-      >
-    </v-card>
+        </v-progress-linear>
+        <v-card-title>{{ question.question }}</v-card-title>
+        <v-card-text>
+          <v-form @submit.prevent="sendAnswer">
+            <v-text-field v-model="answer" label="Введите ответ" outlined>
+            </v-text-field>
+            <v-btn type="submit" color="success" depressed
+              >Ответить</v-btn
+            ></v-form
+          >
+        </v-card-text>
+      </v-card>
+      <v-card v-if="noQuestion">
+        <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
+      </v-card>
+      <v-card v-if="stop">
+        <v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
+      </v-card>
+      <v-card v-if="startMessage">
+        <v-card-title>{{ tests.title }}</v-card-title>
+        <v-card-text>{{ tests.description }}</v-card-text>
+        <v-card-actions
+          >Время ответа на один вопрос:
+          {{ tests.timeToAnswer }}c.</v-card-actions
+        >
+      </v-card>
     </v-col>
   </v-row>
 </template>
@@ -61,12 +71,20 @@
           })
           .then(res => {
             if (res.status == 200) {
-             this.reset()
-             this.noQuestion = true
+              this.reset();
+              this.noQuestion = true;
               this.answer = "";
               this.question = {};
             }
           });
+      },
+      startTimer() {
+        clearInterval(this.interval);
+        this.value = 100;
+        let step = 100 / this.session.timeToAnswer;
+        this.interval = setInterval(() => {
+          this.value -= step;
+        }, 1000);
       },
       startSocket() {
         var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
@@ -87,10 +105,17 @@
           let data = JSON.parse(event.data);
           console.log(event);
           console.log(data);
-          this.reset()
+          this.reset();
           if (data.type == "question") {
             this.newQuestion = true;
             this.question = data;
+            this.timer = true;
+						this.startTimer();
+						setTimeout(() => {
+							this.disabled = false;
+							clearInterval(this.interval);
+							this.timer = false;
+						}, this.question.question.until * 1000 + 3);
           } else if (data.type == "stop") {
             this.stop = true;
           }
@@ -104,7 +129,7 @@
       this.$store.dispatch("registerUserInTest", this.id).then(res => {
         if (res.status == 200 || res.status == 302) {
           this.startSocket();
-          this.reset()
+          this.reset();
           this.startMessage = true;
           this.tests = res.data.test;
         }
@@ -112,6 +137,9 @@
     },
     data() {
       return {
+        timer: false,
+        interval: 0,
+        value: 0,
         startMessage: false,
         newQuestion: false,
         noQuestion: true,
@@ -124,4 +152,9 @@
   };
 </script>
 
-<style></style>
+<style>
+  .v-card {
+    box-shadow: 0 8px 16px 0px rgba(10, 14, 29, 0.04),
+      0px 8px 64px 0px rgba(10, 14, 29, 0.08) !important;
+  }
+</style>

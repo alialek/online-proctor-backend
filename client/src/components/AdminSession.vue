@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="session">
 		<confirm ref="confirm"></confirm>
 
 		<section
@@ -8,11 +8,18 @@
 			style="height: 85vh"
 		>
 			<v-toolbar flat>
-				<v-col>
-					<v-row></v-row>
-					<v-row>Ссылка: https://app.netquest.ru/session/?id={{session._id}}</v-row>
-				</v-col>
 				<v-toolbar-title class="">{{ session.title }}</v-toolbar-title>
+				<v-spacer></v-spacer>
+				<v-row dense>
+					<v-col>
+						<h2 class="subtitle-2">
+							Ссылка на сессию:
+							<v-chip link class="ma-2" color="primary" @click="copyLink">
+								{{ `https://app.netquest.ru/session/?id=${session._id}` }}
+							</v-chip>
+						</h2>
+					</v-col>
+				</v-row>
 				<v-spacer></v-spacer>
 				<h2 class="subtitle-2">
 					Время ответа: {{ session.timeToAnswer + " c." }}
@@ -21,6 +28,10 @@
 				<h2 class="subtitle-2">
 					Статус сессии: {{ session.isActive ? "активна" : "неактивна" }}
 				</h2>
+				<v-spacer></v-spacer>
+				<v-btn color="red" dark @click="goToAdminPanel">
+					Завершить
+				</v-btn>
 			</v-toolbar>
 			<v-toolbar flat height="25">
 				<v-progress-linear
@@ -46,7 +57,7 @@
 							label="Введите новый вопрос"
 						></v-text-field>
 					</v-col>
-					<v-col cols="1">
+					<!-- <v-col cols="1">
 						<v-btn
 							:disabled="disabled"
 							text
@@ -54,7 +65,7 @@
 							@click="sendQuestion"
 							><v-icon>mdi-send</v-icon></v-btn
 						>
-					</v-col>
+					</v-col> -->
 					<v-col cols="2">
 						<v-btn
 							:disabled="disabled"
@@ -93,11 +104,89 @@
 				</v-tab-item>
 			</v-tabs>
 		</section>
-		<section v-else></section>
+		<section v-else>
+			<v-toolbar flat>
+				<v-toolbar-title class="">{{ session.title }}</v-toolbar-title>
+				<v-spacer></v-spacer>
+				<h2 class="subtitle-2">
+					Время ответа: {{ session.timeToAnswer + " c." }}
+				</h2>
+				<v-spacer></v-spacer>
+				<h2 class="subtitle-2">
+					Статус сессии: {{ session.isActive ? "активна" : "неактивна" }}
+				</h2>
+				<v-spacer></v-spacer>
+				<v-btn color="primary" dark @click="goToAdminPanel">
+					Назад
+				</v-btn>
+			</v-toolbar>
+			<v-tabs vertical>
+				<v-tab
+					v-for="(participant, index) in session.participants"
+					:key="participant._id"
+					@click="getQuestionAnswers(question._id)"
+				>
+					{{ index + 1 }}. {{ question.question }}
+				</v-tab>
+
+				<v-tab-item v-for="question in session.questions" :key="question._id">
+					<v-card>
+						<v-card-title> {{ activeQuestionAnswers.question }} </v-card-title>
+						<v-card-text>
+							{{ activeQuestionAnswers.answers }}
+							<v-data-table
+								:headers="headers"
+								:items="activeQuestionAnswers.answers"
+								class="elevation-1"
+								hide-default-footer
+							></v-data-table>
+						</v-card-text>
+					</v-card>
+				</v-tab-item>
+			</v-tabs>
+		</section>
 	</div>
 </template>
 
 <script>
+function fallbackCopyTextToClipboard(text) {
+	var textArea = document.createElement("textarea");
+	textArea.value = text;
+
+	// Avoid scrolling to bottom
+	textArea.style.top = "0";
+	textArea.style.left = "0";
+	textArea.style.position = "fixed";
+
+	document.body.appendChild(textArea);
+	textArea.focus();
+	textArea.select();
+
+	try {
+		var successful = document.execCommand("copy");
+		var msg = successful ? "successful" : "unsuccessful";
+		console.log("Fallback: Copying text command was " + msg);
+	} catch (err) {
+		console.error("Fallback: Oops, unable to copy", err);
+	}
+
+	document.body.removeChild(textArea);
+}
+function copyTextToClipboard(text) {
+	if (!navigator.clipboard) {
+		fallbackCopyTextToClipboard(text);
+		return;
+	}
+	navigator.clipboard.writeText(text).then(
+		function() {
+			console.log("Async: Copying to clipboard was successful!");
+		},
+		function(err) {
+			console.error("Async: Could not copy text: ", err);
+		}
+	);
+}
+
 import Confirm from "./Confirm";
 export default {
 	components: {
@@ -190,30 +279,47 @@ export default {
 				.catch(err => {
 					console.error(err);
 				});
+		},
+		copyLink() {
+			try {
+				copyTextToClipboard(
+					`https://app.netquest.ru/session/?id=${this.session._id}`
+				);
+				this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
+			} catch (error) {
+				this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
+			}
+		},
+		goToAdminPanel() {
+			this.$router.push({ name: "AdminPanel" }).catch(() => {});
 		}
 	},
 	mounted() {
 		this.$store.dispatch("getSession", this.id);
 	},
 	async beforeRouteLeave(to, from, next) {
-		if (
-			await this.$refs.confirm.open(
-				"Завершение сессии",
-				"Вы точно хотите завершить текущую сессию?",
-				{ color: "red" }
-			)
-		) {
-			this.$store
-				.dispatch("disableSession", this.id)
-				.then(() => {
-					next();
-				})
-				.catch(err => {
-					console.error(err);
-					next(false);
-				});
+		if (this.session.isActive) {
+			if (
+				await this.$refs.confirm.open(
+					"Завершение сессии",
+					"Вы точно хотите завершить текущую сессию?",
+					{ color: "red" }
+				)
+			) {
+				this.$store
+					.dispatch("disableSession", this.id)
+					.then(() => {
+						next();
+					})
+					.catch(err => {
+						console.error(err);
+						next(false);
+					});
+			} else {
+				next(false);
+			}
 		} else {
-			next(false);
+			next();
 		}
 	},
 	beforeDestroy() {

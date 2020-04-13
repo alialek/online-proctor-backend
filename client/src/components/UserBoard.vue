@@ -1,6 +1,6 @@
 <template>
-  <div class="dashboard wrapper">
-    <v-row>
+  <div class="dashboard wrapper" >
+    <v-row style="height: 100%" class="justify-center align-center align-items-center">
       <v-col xs="12" md="6" lg="6">
         <v-card max-width="400">
           <v-card-title>
@@ -46,7 +46,5 @@
   .dashboard.wrapper {
     height: 100vh;
     overflow: hidden;
-  }
-  .card {
   }
 </style>

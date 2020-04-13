@@ -132,8 +132,6 @@ html {
 .wrapper {
 	width: 80vw;
 	height: 89vh;
-	background: #f9f9f9;
-	box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.0778245);
 	border-radius: 20px;
 	margin: 0 auto;
 }

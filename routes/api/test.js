@@ -124,7 +124,7 @@ router.post("/:id", isAuthor, async (req, res) => {
       let questions = await Question.create({
         question: req.body.question,
         answers: [],
-        until: Math.floor(Date.now() / 1000) + test.timeToAnswer + 5,
+        until: test.timeToAnswer,
       });
 
       test.questions.push(questions);
@@ -248,8 +248,7 @@ router.post("/register/:id", auth, async (req, res) => {
       userId: req.user.id,
       answers: [],
     };
-    console.log(test.participants[0].userId, req.user.id);
-    let isParticipantRegistered = test.participants.findIndex(
+    let isParticipantRegistered = test.participants.length == 0 ? -1 : test.participants.findIndex(
       (obj) => obj.userId == req.user.id,
     );
     if (isParticipantRegistered == -1) {
