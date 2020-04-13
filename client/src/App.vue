@@ -15,14 +15,14 @@
 				</div> -->
 				</div>
 				<div class="header__admin" v-if="isAdmin">
-					<vs-button size="small" transparent @click="goToAdminPanel"
-						>Панель администратора</vs-button
-					>
+					<v-btn @click="goToAdminPanel" color="primary" dark>
+						Панель администратора
+					</v-btn>
 				</div>
 				<div class="header__exit">
-					<vs-button danger @click="logout">
+					<v-btn @click="logout" v-if="!isActiveSession" color="red" dark>
 						Выход
-					</vs-button>
+					</v-btn>
 				</div>
 			</div>
 
@@ -59,6 +59,13 @@ export default {
 		},
 		snackbar() {
 			return this.$store.state.process.snack;
+		},
+		isActiveSession() {
+			if (this.$store.getters.session) {
+				return this.$store.getters.session.isActive;
+			} else {
+				return false;
+			}
 		}
 	},
 	methods: {
@@ -127,11 +134,13 @@ html {
 	width: 100%;
 	height: 100%;
 	padding-top: 9vh;
-	background: linear-gradient(51.79deg, #655af3 -23.83%, #a59bff 92.58%);
+	background: #1976d2;
+	// background: linear-gradient(51.79deg, #655af3 -23.83%, #a59bff 92.58%);
 }
 .wrapper {
 	width: 80vw;
 	height: 89vh;
+	
 	border-radius: 20px;
 	margin: 0 auto;
 }
