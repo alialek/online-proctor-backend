@@ -14,7 +14,7 @@ module.exports = async function(req, res, next) {
     const decoded = jwt.verify(token, config.get("jwtSecret"));
     let user = await User.findOne({_id: decoded.user.id});
     req.user = user;
-    if (user.isAdmin && user.tests.indexOf(req.params.id) >= 0) {
+    if (user.isAdmin) {
       next();
     } else {
       return res.status(401).json({ msg: "Отсутствуют права администратора" });

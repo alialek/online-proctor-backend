@@ -13,6 +13,9 @@ const AnswerSchema = new mongoose.Schema({
   answer: {
     type: String
   },
+  question: {
+    type: String
+  },
   mark: {
     type: Number,
     default: 0
@@ -25,6 +28,9 @@ const QuestionSchema = new mongoose.Schema({
     type: String,
   },
   until: {
+    type: String
+  },
+  deadline: {
     type: String
   },
   answers: {
@@ -56,9 +62,11 @@ const TestSchema = new mongoose.Schema({
   questions: {
     type: Array,
   }, 
-  participants: {
-    type: Array
-  }
+  participants: [{
+    userId: '',
+    userName: '',
+    answers: [AnswerSchema]
+  }]
 });
 
 module.exports = {

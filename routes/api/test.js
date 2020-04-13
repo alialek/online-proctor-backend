@@ -67,12 +67,20 @@ router.get("/:id", isAuthor, async (req, res) => {
   let id = req.params.id;
   let stop = req.query.stop;
   let test = await Test.findById(id);
-  
+
   try {
     if (stop) {
       test.isActive = false;
-      await test.save()
-      res.status(200).json({status: 'success', message: 'Сессия остановлена'});
+      try {
+        for (let i = 0; i < req.app.wssUsers[id].length; i++) {
+          req.app.wssUsers[id][i].send(JSON.stringify({ type: "stop" }));
+        }
+        delete req.app.wssUsers[id];
+      } catch {}
+      await test.save();
+      res
+        .status(200)
+        .json({ status: "success", message: "Сессия остановлена" });
     } else {
       let user = await User.findById(req.user.id);
       if (user.tests.indexOf(id) >= 0) {
@@ -108,15 +116,12 @@ router.get("/:id_test/:id_question", isAdmin, async (req, res) => {
 //@access  Автор
 
 router.post("/:id", isAuthor, async (req, res) => {
-  console.log('Отправка нового вопроса')
+  console.log("Отправка нового вопроса");
   let idTest = req.params.id;
   let test = await Test.findById(idTest);
   if (req.query.stop) {
     test.isActive = false;
-    for (var key in req.app.wssUsers[idTest]) {
-      req.app.wssUsers[idTest][key].send(JSON.stringify({ type: "stop" }));
-    }
-    delete req.app.wssUsers[idTest];
+
     let saved = await test.save();
     res.json(saved);
   } else {
@@ -125,16 +130,22 @@ router.post("/:id", isAuthor, async (req, res) => {
         question: req.body.question,
         answers: [],
         until: test.timeToAnswer,
+        deadline:
+          Math.floor(Date.now() / 1000) + parseInt(test.timeToAnswer) + 5,
       });
+      if (!req.app.wssUsers[idTest]) {
+        return res.status(500).send("Еще нет пользователей");
+      } else {
+        test.questions.push(questions);
+      }
 
-      test.questions.push(questions);
-      for (var key in req.app.wssUsers[idTest]) {
-        req.app.wssUsers[idTest][key].send(
+      for (let i = 0; i < req.app.wssUsers[idTest].length; i++) {
+        req.app.wssUsers[idTest][i].send(
           JSON.stringify({
             id: questions._id,
             type: "question",
             question: questions.question,
-            until: questions.until - 5,
+            until: parseInt(questions.until) + 5,
           }),
         );
       }
@@ -162,20 +173,22 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
+    console.log(id);
     let answer = await Answer.findById(id);
     let test = await Test.findById(idTest);
+
     answer.mark = mark;
     let result = await answer.save();
     let index = test.participants.findIndex(
-      (obj) => obj.userId == answer.userId,
+      (obj) => obj.userId == result.userId,
     );
-    if (index > 0) {
+    if (index >= 0) {
       let aIndex = test.participants[index].answers.findIndex(
-        (obj) => obj._id == answer._id,
+        (obj) => obj._id.toString() == result.id.toString(),
       );
-      test.participants[index].answers[aIndex] = result;
+      test.participants[index].answers[aIndex].mark = result.mark;
       await test.save();
-      res.json({ status: "error", message: "Участник не найден", result });
+      res.json({ result });
     } else {
       res.status(404).json({ status: "error", message: "Участник не найден" });
     }
@@ -190,19 +203,20 @@ router.put("/:id/:question", isAuthor, async (req, res) => {
 //@access  Auth user
 
 router.post("/answer/:id/:question", auth, async (req, res) => {
-  console.log('f')
   let idTest = req.params.id;
   let questionId = req.params.question;
-  let userName = await User.findById(req.user.id).select('name');
+  let userName = await User.findById(req.user.id).select("name");
   let { answer } = req.body;
   try {
     let test = await Test.findById(idTest);
     let question = await Question.findById(questionId);
-    if (question.until > Math.floor(Date.now() / 1000)) {
+    console.log(question);
+    if (parseInt(question.deadline) > Math.floor(Date.now() / 1000)) {
       let newAnswer = await Answer.create({
         answer,
         questionId,
-        userName,
+        question: question.question,
+        userName: userName.name,
         userId: req.user.id,
         mark: 0,
       });
@@ -212,10 +226,11 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
       );
       console.log("Находим индекс участника", index);
       if (index >= 0) {
+        console.log(newAnswer);
         test.participants[index].answers.push(newAnswer);
         console.log("Сохраняем");
-        await test.save();
-
+        let check = await test.save();
+        console.log(check.participants[index].answers);
         question.answers.push(newAnswer);
         await question.save();
         res.status(200).json({ status: "success", message: "Ответ сохранен" });
@@ -240,17 +255,20 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
 //@access  Authenticated (user)
 
 router.post("/register/:id", auth, async (req, res) => {
-  console.log(req.params)
+  console.log(req.params);
   try {
     let test = await Test.findOne({ _id: req.params.id });
+    let user = await User.findById(req.user.id);
     console.log("check for test");
     let newParticipant = {
+      userName: user.name,  
       userId: req.user.id,
       answers: [],
     };
-    let isParticipantRegistered = test.participants.length == 0 ? -1 : test.participants.findIndex(
-      (obj) => obj.userId == req.user.id,
-    );
+    let isParticipantRegistered =
+      test.participants.length == 0
+        ? -1
+        : test.participants.findIndex((obj) => obj.userId == req.user.id);
     if (isParticipantRegistered == -1) {
       test.participants.push(newParticipant);
       test.save().then((data) => {
@@ -262,6 +280,7 @@ router.post("/register/:id", auth, async (req, res) => {
             description: data.description,
             timeToAnswer: data.timeToAnswer,
             id: data._id,
+            isActive: test.isActive,
           },
         });
       });
@@ -274,6 +293,7 @@ router.post("/register/:id", auth, async (req, res) => {
           description: test.description,
           timeToAnswer: test.timeToAnswer,
           id: test._id,
+          isActive: test.isActive,
         },
       });
     }

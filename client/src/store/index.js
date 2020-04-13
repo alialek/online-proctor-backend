@@ -67,7 +67,7 @@ export default new Vuex.Store({
 
       return new Promise((resolve, reject) => {
         axios({
-          url: "https://app.netquest.ru/api/auth",
+          url: "http://localhost:5000/api/auth",
           data: user,
           method: "POST"
         })
@@ -78,7 +78,9 @@ export default new Vuex.Store({
             if (user.isAdmin) {
               localStorage.setItem("ddl-bg-285015", 1584678841912);
             }
-            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;samesite=none;secure;`;
+            console.log( `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;secure;`)
+            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;path= ;`;
+            console.log(document.cookie)
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", { token, user });
             resolve(resp);
@@ -278,7 +280,7 @@ export default new Vuex.Store({
     rateAnswer({ commit }, payload) {
       return new Promise((resolve, reject) => {
         axios
-          .put(`/test/${payload.id}/${payload.questionId}`)
+          .put(`/test/${payload.id}/${payload.questionId}`, {mark: payload.mark, id: payload.answerId})
           .then(resp => {
             resolve(resp);
             commit("SET_SUCCESS", resp.data.message);

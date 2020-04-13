@@ -2,7 +2,7 @@
   <v-row
     class="justify-center align-center"
     style="height: 100vh; width: 100vw; overflow: hidden; background-color: #E8F5E9;"
-    ><v-col xs="12" md="6" lg="6">
+    ><v-col xs="6" md="6" lg="6">
       <v-card v-if="newQuestion">
         <v-progress-linear
           :active="timer"
@@ -25,20 +25,27 @@
         </v-card-text>
       </v-card>
       <v-card v-if="noQuestion">
-        <v-card-title>Вопросов еще нет, но вы держитесь</v-card-title>
+        <v-card-title>Вопросов нет, но вы держитесь</v-card-title>
       </v-card>
       <v-card v-if="stop">
         <v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
       </v-card>
       <v-card v-if="startMessage">
-        <v-card-title>{{ tests.title }}</v-card-title>
-        <v-card-text>{{ tests.description }}</v-card-text>
-        <v-card-actions
-          >Время ответа на один вопрос:
-          {{ tests.timeToAnswer }}c.</v-card-actions
+        <v-card-title class="display-1">{{ tests.title }}</v-card-title>
+        <v-card-text
+          ><h1 class="title">{{ tests.description }}</h1>
+          <p class="title">
+            Время ответа на один вопрос: {{ tests.timeToAnswer }}c.
+          </p></v-card-text
         >
       </v-card>
     </v-col>
+    <v-dialog max-width="600" v-model="warnDialog">
+      <v-card>
+        <v-card-title color=error>Тест заверешен</v-card-title>
+        <v-card-text>Спасибо за участие!</v-card-text>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
@@ -81,22 +88,28 @@
       startTimer() {
         clearInterval(this.interval);
         this.value = 100;
-        let step = 100 / this.session.timeToAnswer;
+        let step = 100 / this.question.until;
         this.interval = setInterval(() => {
           this.value -= step;
         }, 1000);
+        if (this.value == 0) {
+           this.reset();
+              this.noQuestion = true;
+              this.answer = "";
+              this.question = {};
+        }
       },
       startSocket() {
-        var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
+        var socket = new WebSocket("ws://localhost:5000/?id=" + this.id);
         socket.onopen = () => {
-          this.$store.commit("setSuccess", "Соединение установлено");
+          this.$store.commit("SET_SUCCESS", "Соединение установлено");
         };
 
         socket.onclose = event => {
           if (event.wasClean) {
-            this.$store.commit("setSuccess", "Соединение закрыто");
+            this.$store.commit("SET_SUCCESS", "Соединение закрыто");
           } else {
-            this.$store.commit("setSuccess", "Соединение оборвалось");
+            this.$store.commit("SET_SUCCESS", "Соединение оборвалось");
           }
           console.log("Код: " + event.code + " причина: " + event.reason);
         };
@@ -110,33 +123,39 @@
             this.newQuestion = true;
             this.question = data;
             this.timer = true;
-						this.startTimer();
-						setTimeout(() => {
-							this.disabled = false;
-							clearInterval(this.interval);
-							this.timer = false;
-						}, this.question.question.until * 1000 + 3);
+            this.startTimer();
+            setTimeout(() => {
+              this.disabled = false;
+              clearInterval(this.interval);
+              this.timer = false;
+            }, this.question.until * 1000 + 5);
           } else if (data.type == "stop") {
             this.stop = true;
           }
         };
         socket.onerror = error => {
-          this.$store.commit("setSuccess", "Ошибка " + error.message);
+          this.$store.commit("SET_ERROR", "Ошибка " + error.message);
         };
       }
     },
     mounted() {
       this.$store.dispatch("registerUserInTest", this.id).then(res => {
         if (res.status == 200 || res.status == 302) {
-          this.startSocket();
+          
+          if(!res.data.test.isActive) {
+            this.warnDialog = true
+          } else {
+            this.startSocket();
           this.reset();
           this.startMessage = true;
           this.tests = res.data.test;
+          }
         }
       });
     },
     data() {
       return {
+        warnDialog: false,
         timer: false,
         interval: 0,
         value: 0,

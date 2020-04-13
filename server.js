@@ -46,9 +46,8 @@ function heartbeat() {
 var wss = new WebSocketServer.Server({
   server: server,
 });
-wss.on("connection", async function (ws, req, kek) {
+wss.on("connection", async function (ws, req) {
   ws.isAlive = true;
-  console.log("Trying to open Socket");
   ws.on("pong", heartbeat);
   let testId = req.url.split("=")[1];
   console.log(req.headers)
@@ -61,6 +60,7 @@ wss.on("connection", async function (ws, req, kek) {
     let test = await Test.findById(testId);
 
     ws.user = user;
+    
 
     clients[testId] === undefined
       ? (clients[testId] = [ws])
@@ -71,7 +71,7 @@ wss.on("connection", async function (ws, req, kek) {
 
 wss.on("close", function () {
   clearInterval(interval);
-  delete clients[id];
+  
 });
 app.wss = wss;
 app.wssUsers = clients;

@@ -140,7 +140,6 @@ html {
 .wrapper {
 	width: 80vw;
 	height: 89vh;
-	
 	border-radius: 20px;
 	margin: 0 auto;
 }
