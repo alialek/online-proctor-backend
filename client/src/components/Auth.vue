@@ -185,6 +185,7 @@ export default {
 				})
 				.catch(errResp => {
 					this.errors = errResp;
+					this.$store.commit("LOADING_STOP");
 				});
 		},
 		register: function() {
@@ -199,7 +200,7 @@ export default {
 				.dispatch("register", user)
 				.then(() => this.$router.push("/dashboard"))
 				.catch(errResp => {
-					console.log(errResp);
+					console.error(errResp);
 				});
 		}
 	},

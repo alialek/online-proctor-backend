@@ -25,7 +25,7 @@
 								<v-col cols="12">
 									<v-text-field
 										regular
-										label="Описание"
+										label="Описание *"
 										v-model="session.description"
 									>
 									</v-text-field>

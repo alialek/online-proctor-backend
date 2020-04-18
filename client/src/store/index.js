@@ -49,12 +49,12 @@ export default new Vuex.Store({
     SET_ERROR(state, data) {
       state.process.snack.enabled = true;
       state.process.snack.color = "error";
-      state.process.snack.text = data;
+      state.process.snack.text = data.message;
     },
     SET_SUCCESS(state, data) {
       state.process.snack.enabled = true;
       state.process.snack.color = "success";
-      state.process.snack.text = data;
+      state.process.snack.text = data.message;
     },
     DISABLE_SESSION(state) {
       state.activeSession = {};
@@ -78,18 +78,19 @@ export default new Vuex.Store({
             if (user.isAdmin) {
               localStorage.setItem("ddl-bg-285015", 1584678841912);
             }
-            console.log( `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;secure;`)
+            // Можно убрать консоль логи?
+            // console.log(`token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;secure;`)
             document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;path= ;`;
-            console.log(document.cookie)
+            // console.log(document.cookie)
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", { token, user });
             resolve(resp);
           })
           .catch(err => {
-            commit("SET_ERROR", err.response);
+            commit("SET_ERROR", { message: "Произошла ошибка... Проверьте правильность введенных данных" });
             localStorage.removeItem("token");
             localStorage.removeItem("ddl-bg-285015");
-            reject(err.response);
+            reject(err);
           });
       });
     },
@@ -110,9 +111,9 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch(err => {
-            commit("SET_ERROR", err.response);
+            commit("SET_ERROR", { message: err.msg });
             localStorage.removeItem("token");
-            reject(err.response);
+            reject(err);
           });
       });
     },
@@ -150,7 +151,6 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -181,7 +181,6 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -192,12 +191,10 @@ export default new Vuex.Store({
         axios
           .get(`/test/${id}?stop=true`)
           .then(resp => {
-            console.log(resp);
             commit("DISABLE_SESSION");
             resolve(resp.data);
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -212,7 +209,6 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -233,7 +229,6 @@ export default new Vuex.Store({
             }
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -248,12 +243,11 @@ export default new Vuex.Store({
             if (resp.status == 200) {
               commit("SET_SUCCESS", "Вопрос отправлен");
             } else {
-              commit("SET_ERROR", resp.data);
+              commit("SET_ERROR", 'Еще нет подключившихся пользователей, либо произошла ошибка');
             }
           })
           .catch(err => {
-            console.error(err);
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { messge: "Еще нет подключившихся пользователей, либо произошла ошибка" });
             reject(err);
           });
       });
@@ -271,7 +265,6 @@ export default new Vuex.Store({
             }
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });
@@ -280,13 +273,12 @@ export default new Vuex.Store({
     rateAnswer({ commit }, payload) {
       return new Promise((resolve, reject) => {
         axios
-          .put(`/test/${payload.id}/${payload.questionId}`, {mark: payload.mark, id: payload.answerId})
+          .put(`/test/${payload.id}/${payload.questionId}`, { mark: payload.mark, id: payload.answerId })
           .then(resp => {
             resolve(resp);
             commit("SET_SUCCESS", resp.data.message);
           })
           .catch(err => {
-            console.error(err);
             commit("SET_ERROR", err);
             reject(err);
           });

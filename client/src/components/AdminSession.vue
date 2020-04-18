@@ -5,7 +5,7 @@
     <section
       v-if="session.isActive"
       class="overflow-y-auto"
-      style="height: 85vh"
+      style="height: 85vh; overflow-x: hidden"
     >
       <v-toolbar flat>
         <v-toolbar-title class="">{{ session.title }}</v-toolbar-title>
@@ -121,7 +121,12 @@
           v-for="(participant, index) in session.participants"
           :key="participant._id"
         >
+          <!-- <v-badge :content="participant.score"> -->
           {{ index + 1 }}. {{ participant.userName }}
+          <!-- </v-badge> -->
+          <v-avatar class="ml-2" color="primary" size="26">
+            <span class="white--text subtitle-2">{{ participant.score }}</span>
+          </v-avatar>
         </v-tab>
 
         <v-tab-item
@@ -134,13 +139,34 @@
             class="elevation-1"
             hide-default-footer
           >
-            <template
-              v-slot:item.setmark="{item}"
-            >
+            <template v-slot:item.setmark="{ item }">
               <v-row>
-                <v-btn fab color="primary" @click="setMark(item, 1)" depressed x-small>1</v-btn>
-                <v-btn fab color="primary" @click="setMark(item, 2)" depressed x-small>2</v-btn>
-                <v-btn fab color="primary" @click="setMark(item, 3)" depressed x-small>3</v-btn>
+                <v-btn
+                  fab
+                  color="error"
+                  @click="setMark(item, 1)"
+                  depressed
+                  x-small
+                  >1</v-btn
+                >
+                <v-btn
+                  fab
+                  color="warning"
+                  @click="setMark(item, 2)"
+                  class="ml-1"
+                  depressed
+                  x-small
+                  >2</v-btn
+                >
+                <v-btn
+                  fab
+                  color="success"
+                  @click="setMark(item, 3)"
+                  class="ml-1"
+                  depressed
+                  x-small
+                  >3</v-btn
+                >
               </v-row>
             </template>
           </v-data-table>
@@ -151,67 +177,24 @@
 </template>
 
 <script>
-  function fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement("textarea");
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      var successful = document.execCommand("copy");
-      var msg = successful ? "successful" : "unsuccessful";
-      console.log("Fallback: Copying text command was " + msg);
-    } catch (err) {
-      console.error("Fallback: Oops, unable to copy", err);
-    }
-
-    document.body.removeChild(textArea);
-  }
-  function copyTextToClipboard(text) {
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(text);
-      return;
-    }
-    navigator.clipboard.writeText(text).then(
-      function() {
-        this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
-        console.log("Async: Copying to clipboard was successful!");
-      },
-      function(err) {
-        this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
-        console.error("Async: Could not copy text: ", err);
-      }
-    );
-  }
-
   import Confirm from "./Confirm";
   export default {
     components: {
-      Confirm
+      Confirm,
     },
     props: {
       id: {
         required: true,
-        type: String
-      }
+        type: String,
+      },
     },
-    computed: {
-      session() {
-        return this.$store.state.session;
-      }
-    },
+
     data() {
       return {
         timer: false,
         disabled: false,
         dialog: false,
+        session: {},
         activeQuestion: "",
         newQuestion: "",
         activeQuestionAnswers: [],
@@ -220,34 +203,41 @@
         headers: [
           { text: "Студент", value: "userName" },
           { text: "Ответ", value: "answer" },
-          { text: "Оценка", value: "mark" }
+          { text: "Оценка", value: "mark" },
         ],
         headersInactive: [
-          { text: "Dопрос", value: "question" },
+          { text: "Вопрос", value: "question" },
           { text: "Ответ", value: "answer" },
           { text: "Оценка", value: "mark" },
-          { text: "Оценить", value: "setmark" }
-        ]
+          { text: "Оценить", value: "setmark" },
+        ],
       };
     },
     methods: {
       setMark(item, mark) {
+        console.log(item);
         let payload = {
           mark,
-          answerId: '',
-          id: '',
-          questionId: '',
-        }
-        this.$store.dispatch('rateAnswer', payload)
+          answerId: item._id,
+          id: this.id,
+          questionId: item.questionId,
+        };
+        item.mark = mark;
+        this.$store
+          .dispatch("rateAnswer", payload)
+          .then(() => {})
+          .catch(() => {
+            item.mark = "нет";
+          });
       },
       sendQuestion(e) {
         e.preventDefault();
         this.$store
           .dispatch("sendQuestion", {
             id: this.id,
-            question: this.newQuestion
+            question: this.newQuestion,
           })
-          .then(res => {
+          .then((res) => {
             if (res.status == 200) {
               this.disabled = true;
               this.timer = true;
@@ -271,23 +261,16 @@
       },
       getQuestionAnswers(id) {
         this.activeQuestion = id;
-        // setInterval(() => {
-        this.$store
-          .dispatch("getQuestionAnswers", { id, testId: this.id })
-          .then(resp => {
-            this.activeQuestionAnswers = {
-              question: resp.data.question,
-              answers: resp.data.answers
-            };
-          });
-        // }, 3000);
-      },
-      rateAnswer(questionId) {
-        this.$store
-          .dispatch("rateAnswer", { id: this.id, questionId: questionId })
-          .then(resp => {
-            console.log(resp);
-          });
+        setInterval(() => {
+          this.$store
+            .dispatch("getQuestionAnswers", { id, testId: this.id })
+            .then((resp) => {
+              this.activeQuestionAnswers = {
+                question: resp.data.question,
+                answers: resp.data.answers,
+              };
+            });
+        }, 3000);
       },
       leaveSession() {
         this.$store
@@ -295,18 +278,18 @@
           .then(() => {
             this.$router.push({ name: "AdminPanel" });
           })
-          .catch(err => {
+          .catch((err) => {
             console.error(err);
           });
       },
       copyLink() {
         try {
-          copyTextToClipboard(
-            `https://app.netquest.ru/session/?id=${this.session._id}`
+          this.copyTextToClipboard(
+            `https://app.netquest.ru/session/?id=${this.session._id}`,
           );
           this.$store.commit(
             "SET_SUCCESS",
-            "Ссылка скопирована в буфер обмена"
+            "Ссылка скопирована в буфер обмена",
           );
         } catch (error) {
           this.$store.commit("SET_ERROR", "Скопируйте ссылку самостоятельно");
@@ -314,10 +297,63 @@
       },
       goToAdminPanel() {
         this.$router.push({ name: "AdminPanel" }).catch(() => {});
-      }
+      },
+      copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+          this.fallbackCopyTextToClipboard(text);
+          return;
+        }
+        navigator.clipboard.writeText(text).then(
+          () => {
+            this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
+            console.log("Async: Copying to clipboard was successful!");
+          },
+          (err) => {
+            this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
+            console.error("Async: Could not copy text: ", err);
+          },
+        );
+      },
+      fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          var successful = document.execCommand("copy");
+          var msg = successful ? "successful" : "unsuccessful";
+          console.log("Fallback: Copying text command was " + msg);
+          this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
+        } catch (err) {
+          this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
+          console.error("Fallback: Oops, unable to copy", err);
+        }
+
+        document.body.removeChild(textArea);
+      },
     },
     mounted() {
-      this.$store.dispatch("getSession", this.id);
+     this.$store.dispatch("getSession", this.id).then(data => {
+      if (data.participants && data.participants.length > 0) {
+        data.participants.forEach(participant => {
+          if (participant.answers.length > 0) {
+            participant.score = participant.answers.reduce(
+              (acc, curr) => acc.mark + curr.mark
+            ).mark;
+          }
+        });
+      }
+
+      this.session = data;
+    });
     },
     async beforeRouteLeave(to, from, next) {
       if (this.session.isActive) {
@@ -325,7 +361,7 @@
           await this.$refs.confirm.open(
             "Завершение сессии",
             "Вы точно хотите завершить текущую сессию?",
-            { color: "red" }
+            { color: "red" },
           )
         ) {
           this.$store
@@ -333,7 +369,7 @@
             .then(() => {
               next();
             })
-            .catch(err => {
+            .catch((err) => {
               console.error(err);
               next(false);
             });
@@ -346,7 +382,7 @@
     },
     beforeDestroy() {
       clearInterval(this.interval);
-    }
+    },
   };
 </script>
 
