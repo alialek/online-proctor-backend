@@ -84,18 +84,25 @@
 					:key="question._id"
 					@click="getQuestionAnswers(question._id)"
 				>
-					{{ index + 1 }}. {{ question.question }}
+					<span class="d-inline-block text-truncate" style="max-width: 355px">
+						{{ index + 1 }}. {{ question.question }}
+					</span>
 				</v-tab>
 
-				<v-tab-item v-for="question in session.questions" :key="question._id">
-					<h2>{{ activeQuestionAnswers.question }}</h2>
+				<v-tab-item
+					v-for="question in session.questions"
+					class="mx-2"
+					:key="question._id"
+				>
+					<p class="subtitle-2">{{ activeQuestionAnswers.question }}</p>
 
 					<v-data-table
 						:headers="headers"
 						:items="activeQuestionAnswers.answers"
-						class="elevation-1"
+						class="elevation-1 mt-2"
 						hide-default-footer
-					></v-data-table>
+					>
+					</v-data-table>
 				</v-tab-item>
 			</v-tabs>
 		</section>
@@ -202,8 +209,7 @@ export default {
 			value: 0,
 			headers: [
 				{ text: "Студент", value: "userName" },
-				{ text: "Ответ", value: "answer" },
-				{ text: "Оценка", value: "mark" }
+				{ text: "Ответ", value: "answer" }
 			],
 			headersInactive: [
 				{ text: "Вопрос", value: "question" },
@@ -215,7 +221,6 @@ export default {
 	},
 	methods: {
 		setMark(item, mark) {
-			console.log(item);
 			let payload = {
 				mark,
 				answerId: item._id,
@@ -261,12 +266,16 @@ export default {
 			}, 1000);
 		},
 		getQuestionAnswers(id) {
-			if (id !== this.activeQuestion) {
-				clearInterval(this.activeInterval);
-				this.activeQuestion = id;
-			} else {
-				this.activeQuestion = id;
-			}
+			clearInterval(this.activeInterval);
+			this.activeQuestion = id;
+			this.$store
+				.dispatch("getQuestionAnswers", { id, testId: this.id })
+				.then(resp => {
+					this.activeQuestionAnswers = {
+						question: resp.data.question,
+						answers: resp.data.answers
+					};
+				});
 			this.activeInterval = setInterval(() => {
 				this.$store
 					.dispatch("getQuestionAnswers", { id, testId: this.id })
@@ -308,10 +317,14 @@ export default {
 			}
 			navigator.clipboard.writeText(text).then(
 				() => {
-					this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
+					this.$store.commit("SET_INFO", {
+						message: "Ссылка скопирована в буфер обмена"
+					});
 				},
 				() => {
-					this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
+					this.$store.commit("SET_INFO", {
+						message: "Скопируйте ссылку самостоятельно"
+					});
 				}
 			);
 		},
@@ -330,9 +343,13 @@ export default {
 
 			try {
 				document.execCommand("copy");
-				this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
+				this.$store.commit("SET_INFO", {
+					message: "Ссылка скопирована в буфер обмена"
+				});
 			} catch (err) {
-				this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
+				this.$store.commit("SET_INFO", {
+					message: "Скопируйте ссылку самостоятельно"
+				});
 			}
 
 			document.body.removeChild(textArea);
@@ -343,9 +360,10 @@ export default {
 			if (data.participants && data.participants.length > 0) {
 				data.participants.forEach(participant => {
 					if (participant.answers.length > 0) {
-						participant.score = participant.answers.reduce(
-							(acc, curr) => acc.mark + curr.mark
-						).mark;
+						participant.score = participant.answers.reduce((acc, curr) => {
+							console.log(acc.mark + curr.mark);
+							return Number(acc.mark + curr.mark);
+						}).mark;
 					}
 				});
 			}

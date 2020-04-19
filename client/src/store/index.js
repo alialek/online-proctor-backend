@@ -56,6 +56,11 @@ export default new Vuex.Store({
       state.process.snack.color = "success";
       state.process.snack.text = data.message;
     },
+    SET_INFO(state, data) {
+      state.process.snack.enabled = true;
+      state.process.snack.color = "info";
+      state.process.snack.text = data.message;
+    },
     DISABLE_SESSION(state) {
       state.activeSession = {};
     }
@@ -225,7 +230,7 @@ export default new Vuex.Store({
             if (resp.status == 200) {
               commit("SET_SUCCESS", { message: "Вопрос отправлен" });
             } else {
-              commit("SET_ERROR", { message: `${resp.data.message}` });
+              commit("SET_ERROR", { message: "Ошибка при отправке ответа" });
             }
           })
           .catch(err => {
@@ -259,7 +264,7 @@ export default new Vuex.Store({
           .then(resp => {
             resolve(resp);
             if (resp.status == 200) {
-              commit("SET_SUCCESS", { message: "Ответы получены " + resp.data.message });
+              // commit("SET_SUCCESS", { message: "Ответы получены" });
             } else {
               commit("SET_ERROR", { message: "Произошла ошибка при получении ответов на вопросы... Перезагрузите страницу" });
             }
