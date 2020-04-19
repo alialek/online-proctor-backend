@@ -225,10 +225,12 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
       );
       if (index >= 0) {
         test.participants[index].answers.push(newAnswer);
-        let check = await test.update();
-        question.answers.push(newAnswer);
-        await question.update();
+        test.save().then(() => {
+          question.answers.push(newAnswer);
+        await question.save();
         res.status(200).json({ status: "success", message: "Ответ сохранен" });
+        })
+        
       } else {
         res
           .status(400)
@@ -241,7 +243,6 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
     }
   } catch (err) {
     console.log('Ошибка')
-    console.log(err)
     console.error(err.message);
     res.status(500).send("Server error");
   }
