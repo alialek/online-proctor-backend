@@ -227,10 +227,12 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
         test.participants[index].answers.push(newAnswer);
         test.save().then(() => {
           question.answers.push(newAnswer);
-        await question.save();
-        res.status(200).json({ status: "success", message: "Ответ сохранен" });
-        })
-        
+          question.save().then(() => {
+            res
+              .status(200)
+              .json({ status: "success", message: "Ответ сохранен" });
+          });
+        });
       } else {
         res
           .status(400)
@@ -242,7 +244,7 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
         .json({ status: "failed", message: "Время ответа истекло" });
     }
   } catch (err) {
-    console.log('Ошибка')
+    console.log("Ошибка");
     console.error(err.message);
     res.status(500).send("Server error");
   }
@@ -259,7 +261,7 @@ router.post("/register/:id", auth, async (req, res) => {
     let user = await User.findById(req.user.id);
     console.log("check for test");
     let newParticipant = {
-      userName: user.name,  
+      userName: user.name,
       userId: req.user.id,
       answers: [],
     };
