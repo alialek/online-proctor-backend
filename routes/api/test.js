@@ -225,9 +225,9 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
       );
       if (index >= 0) {
         test.participants[index].answers.push(newAnswer);
-        let check = await test.save();
+        let check = await test.update();
         question.answers.push(newAnswer);
-        await question.save();
+        await question.update();
         res.status(200).json({ status: "success", message: "Ответ сохранен" });
       } else {
         res
