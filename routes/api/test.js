@@ -210,7 +210,6 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
   try {
     let test = await Test.findById(idTest);
     let question = await Question.findById(questionId);
-    console.log(question);
     if (parseInt(question.deadline) > Math.floor(Date.now() / 1000)) {
       let newAnswer = await Answer.create({
         answer,
@@ -226,11 +225,8 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
       );
       console.log("Находим индекс участника", index);
       if (index >= 0) {
-        console.log(newAnswer);
         test.participants[index].answers.push(newAnswer);
-        console.log("Сохраняем");
         let check = await test.save();
-        console.log(check.participants[index].answers);
         question.answers.push(newAnswer);
         await question.save();
         res.status(200).json({ status: "success", message: "Ответ сохранен" });

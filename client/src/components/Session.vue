@@ -19,7 +19,7 @@
 				>
 				</v-progress-linear>
 
-				<p class="subtitle-2 ma-2">
+				<p class="title pa-4">
 					{{ question.question }}
 				</p>
 				<v-card-text>
@@ -33,7 +33,7 @@
 				</v-card-text>
 			</v-card>
 			<v-card class="mr-4" v-if="noQuestion">
-				<v-card-title>Ожидайте следующего вопроса!</v-card-title>
+				<p class="title pa-4">Ожидайте следующего вопроса!</p>
 			</v-card>
 			<v-card class="mr-4" v-if="stop">
 				<v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
@@ -126,13 +126,11 @@ export default {
 						message: "Соединение оборвалось"
 					});
 				}
-				console.log("Код: " + event.code + " причина: " + event.reason);
+
 			};
 
 			socket.onmessage = event => {
 				let data = JSON.parse(event.data);
-				console.log(event);
-				console.log(data);
 				this.reset();
 				if (data.type == "question") {
 					this.newQuestion = true;
@@ -143,7 +141,9 @@ export default {
 						this.disabled = false;
 						clearInterval(this.interval);
 						this.timer = false;
-					}, this.question.until * 1000 + 5);
+						this.reset();
+						this.noQuestion = true
+					}, this.question.until * 1000);
 				} else if (data.type == "stop") {
 					this.stop = true;
 				}

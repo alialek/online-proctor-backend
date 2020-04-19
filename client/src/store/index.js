@@ -92,7 +92,9 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch(err => {
-            commit("SET_ERROR", { message: "Произошла ошибка... Проверьте правильность введенных данных" });
+            let errors = err.errors.map(error => error.msg)
+            console.log(errors)
+            commit("SET_ERROR", { message: errors.join('') });
             localStorage.removeItem("token");
             localStorage.removeItem("ddl-bg-285015");
             reject(err);
@@ -107,6 +109,7 @@ export default new Vuex.Store({
           method: "POST"
         })
           .then(resp => {
+            
             const token = resp.data.token;
             const user = resp.data.user;
             localStorage.setItem("token", token);
@@ -116,7 +119,9 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch(err => {
-            commit("SET_ERROR", { message: "Произошла ошибка... Проверьте корректность введенных данных" });
+            let errors = err.errors.map(error => error.msg)
+            console.log(errors)
+            commit("SET_ERROR", { message: errors.join(', ') });
             commit('LOADING_STOP')
             localStorage.removeItem("token");
             reject(err);
