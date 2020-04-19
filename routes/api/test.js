@@ -223,7 +223,6 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
       let index = test.participants.findIndex(
         (obj) => obj.userId == req.user.id,
       );
-      console.log("Находим индекс участника", index);
       if (index >= 0) {
         test.participants[index].answers.push(newAnswer);
         let check = await test.save();
@@ -241,6 +240,8 @@ router.post("/answer/:id/:question", auth, async (req, res) => {
         .json({ status: "failed", message: "Время ответа истекло" });
     }
   } catch (err) {
+    console.log('Ошибка')
+    console.log(err)
     console.error(err.message);
     res.status(500).send("Server error");
   }
