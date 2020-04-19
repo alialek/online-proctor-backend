@@ -51,7 +51,7 @@ export default {
 .dashboard.wrapper {
 	height: 100vh;
 	overflow: hidden;
-	margin-top: 80px;
+	margin-top: 10px;
 	/* display: flex;
 	flex-direction: column;
 	justify-content: center;

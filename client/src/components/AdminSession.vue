@@ -78,11 +78,12 @@
 				</v-row>
 			</v-form>
 
-			<v-tabs vertical>
+			<v-tabs vertical center-active>
 				<v-tab
 					v-for="(question, index) in session.questions"
 					:key="question._id"
 					@click="getQuestionAnswers(question._id)"
+					style="max-height: 60vh"
 				>
 					<span class="d-inline-block text-truncate" style="max-width: 355px">
 						{{ index + 1 }}. {{ question.question }}
@@ -101,6 +102,7 @@
 						:items="activeQuestionAnswers.answers"
 						class="elevation-1 mt-2"
 						hide-default-footer
+						:items-per-page="9999"
 					>
 					</v-data-table>
 				</v-tab-item>
@@ -142,6 +144,7 @@
 					<v-data-table
 						:headers="headersInactive"
 						:items="participant.answers"
+						:items-per-page="9999"
 						class="elevation-1"
 						hide-default-footer
 					>
@@ -150,7 +153,7 @@
 								<v-btn
 									fab
 									color="error"
-									@click="setMark(item, 1)"
+									@click="setMark(item, 1, participant)"
 									depressed
 									x-small
 									>1</v-btn
@@ -158,7 +161,7 @@
 								<v-btn
 									fab
 									color="warning"
-									@click="setMark(item, 2)"
+									@click="setMark(item, 2, participant)"
 									class="ml-1"
 									depressed
 									x-small
@@ -167,7 +170,7 @@
 								<v-btn
 									fab
 									color="success"
-									@click="setMark(item, 3)"
+									@click="setMark(item, 3, participant)"
 									class="ml-1"
 									depressed
 									x-small
@@ -176,6 +179,13 @@
 							</v-row>
 						</template>
 					</v-data-table>
+					<v-row>
+						<v-col>
+							<p class="subtitle-1" :key="rerenderKey">
+								Общая оценка: {{ participant.score }}
+							</p>
+						</v-col>
+					</v-row>
 				</v-tab-item>
 			</v-tabs>
 		</section>
@@ -216,11 +226,12 @@ export default {
 				{ text: "Ответ", value: "answer" },
 				{ text: "Оценка", value: "mark" },
 				{ text: "Оценить", value: "setmark" }
-			]
+			],
+			rerenderKey: 0
 		};
 	},
 	methods: {
-		setMark(item, mark) {
+		setMark(item, mark, participant) {
 			let payload = {
 				mark,
 				answerId: item._id,
@@ -230,9 +241,17 @@ export default {
 			item.mark = mark;
 			this.$store
 				.dispatch("rateAnswer", payload)
-				.then(() => {})
-				.catch(() => {
-					item.mark = "нет";
+				.then(() => {
+					this.calculateScore(participant);
+					let person = this.session.participants.filter(
+						p => p._id === participant._id
+					)[0];
+					person.score = participant.score;
+					this.rerenderKey += 1;
+				})
+				.catch(err => {
+					console.error(err);
+					item.mark = 0;
 				});
 		},
 		sendQuestion(e) {
@@ -244,6 +263,7 @@ export default {
 				})
 				.then(res => {
 					if (res.status == 200) {
+						this.newQuestion = "";
 						this.disabled = true;
 						this.timer = true;
 						this.startTimer();
@@ -253,7 +273,9 @@ export default {
 							this.timer = false;
 						}, this.session.timeToAnswer * 1000 + 3);
 					}
-					this.$store.dispatch("getSession", this.id);
+					this.$store.dispatch("getSession", this.id).then(data => {
+						this.session = data;
+					});
 					this.getQuestionAnswers(res.data._id);
 				});
 		},
@@ -353,21 +375,26 @@ export default {
 			}
 
 			document.body.removeChild(textArea);
+		},
+		calculateScore(participant) {
+			if (participant.answers.length > 0) {
+				let temp = 0;
+				participant.answers.forEach(answer => {
+					temp += answer.mark;
+				});
+				participant.score = temp;
+			} else {
+				participant.score = 0;
+			}
 		}
 	},
 	mounted() {
 		this.$store.dispatch("getSession", this.id).then(data => {
 			if (data.participants && data.participants.length > 0) {
 				data.participants.forEach(participant => {
-					if (participant.answers.length > 0) {
-						participant.score = participant.answers.reduce((acc, curr) => {
-							console.log(acc.mark + curr.mark);
-							return Number(acc.mark + curr.mark);
-						}).mark;
-					}
+					this.calculateScore(participant);
 				});
 			}
-
 			this.session = data;
 		});
 	},
@@ -383,6 +410,7 @@ export default {
 				this.$store
 					.dispatch("disableSession", this.id)
 					.then(() => {
+						clearInterval(this.activeInterval);
 						next();
 					})
 					.catch(err => {
@@ -405,5 +433,9 @@ export default {
 <style>
 .admin.wrapper {
 	padding: 0;
+	max-height: 70vh;
+}
+.v-tab {
+	max-height: 35px;
 }
 </style>

@@ -234,7 +234,7 @@ export default new Vuex.Store({
             }
           })
           .catch(err => {
-            commit("SET_ERROR", { message: "Произошла ошибка отправки вопроса" });
+            commit("SET_ERROR", { message: "Видимо, вы не успели ответить :(" });
             reject(err);
           });
       });
