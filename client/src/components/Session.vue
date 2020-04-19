@@ -34,7 +34,7 @@
       </v-card>
       <v-card class="mr-4" v-if="noQuestion">
         <v-card-title>Вопросов нет, но вы держитесь</v-card-title>
-      </v-card >
+      </v-card>
       <v-card class="mr-4" v-if="stop">
         <v-card-title>Спасибо за участие! Тестирование завершено.</v-card-title>
       </v-card>
@@ -111,14 +111,20 @@
       startSocket() {
         var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
         socket.onopen = () => {
-          this.$store.commit("SET_SUCCESS", "Соединение установлено");
+          this.$store.commit("SET_SUCCESS", {
+            message: "Соединение установлено",
+          });
         };
 
         socket.onclose = (event) => {
           if (event.wasClean) {
-            this.$store.commit("SET_SUCCESS", "Соединение закрыто");
+            this.$store.commit("SET_SUCCESS", {
+              message: "Соединение закрыто",
+            });
           } else {
-            this.$store.commit("SET_SUCCESS", "Соединение оборвалось");
+            this.$store.commit("SET_SUCCESS", {
+              message: "Соединение оборвалось",
+            });
           }
           console.log("Код: " + event.code + " причина: " + event.reason);
         };
@@ -143,7 +149,7 @@
           }
         };
         socket.onerror = (error) => {
-          this.$store.commit("SET_ERROR", "Ошибка " + error.message);
+          this.$store.commit("SET_ERROR", {message: "Ошибка " + error.message});
         };
       },
     },
