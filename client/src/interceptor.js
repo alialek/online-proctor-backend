@@ -23,6 +23,7 @@ instance.interceptors.request.use(config => {
   return config
 }, error => {
   store.commit('SET_ERROR')
+  store.commit('LOADING_STOP')
   return Promise.reject(error)
 })
 
@@ -31,6 +32,7 @@ instance.interceptors.response.use(response => {
   return response
 }, error => {
   store.commit('SET_ERROR')
+  store.commit('LOADING_STOP')
   if (error.response && error.response.status && error.response.status === 401) {
     store.dispatch("logout")
       .then(() => router.push('/auth'))

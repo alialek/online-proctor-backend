@@ -88,9 +88,8 @@
 				</v-tab>
 
 				<v-tab-item v-for="question in session.questions" :key="question._id">
-					<h1>{{ activeQuestionAnswers.question }}</h1>
+					<h2>{{ activeQuestionAnswers.question }}</h2>
 
-					{{ activeQuestionAnswers.answers }}
 					<v-data-table
 						:headers="headers"
 						:items="activeQuestionAnswers.answers"
@@ -195,6 +194,7 @@ export default {
 			disabled: false,
 			dialog: false,
 			session: {},
+			activeInterval: {},
 			activeQuestion: "",
 			newQuestion: "",
 			activeQuestionAnswers: [],
@@ -249,6 +249,7 @@ export default {
 						}, this.session.timeToAnswer * 1000 + 3);
 					}
 					this.$store.dispatch("getSession", this.id);
+					this.getQuestionAnswers(res.data._id);
 				});
 		},
 		startTimer() {
@@ -260,8 +261,13 @@ export default {
 			}, 1000);
 		},
 		getQuestionAnswers(id) {
-			this.activeQuestion = id;
-			setInterval(() => {
+			if (id !== this.activeQuestion) {
+				clearInterval(this.activeInterval);
+				this.activeQuestion = id;
+			} else {
+				this.activeQuestion = id;
+			}
+			this.activeInterval = setInterval(() => {
 				this.$store
 					.dispatch("getQuestionAnswers", { id, testId: this.id })
 					.then(resp => {
@@ -301,10 +307,10 @@ export default {
 				return;
 			}
 			navigator.clipboard.writeText(text).then(
-				function() {
+				() => {
 					this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
 				},
-				function() {
+				() => {
 					this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
 				}
 			);
@@ -323,13 +329,10 @@ export default {
 			textArea.select();
 
 			try {
-				var successful = document.execCommand("copy");
-				var msg = successful ? "successful" : "unsuccessful";
-				console.log("Fallback: Copying text command was " + msg);
+				document.execCommand("copy");
 				this.$store.commit("SET_INFO", "Ссылка скопирована в буфер обмена");
 			} catch (err) {
 				this.$store.commit("SET_INFO", "Скопируйте ссылку самостоятельно");
-				console.error("Fallback: Oops, unable to copy", err);
 			}
 
 			document.body.removeChild(textArea);

@@ -111,7 +111,8 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch(err => {
-            commit("SET_ERROR", { message: err.msg });
+            commit("SET_ERROR", { message: "Произошла ошибка... Проверьте корректность введенных данных" });
+            commit('LOADING_STOP')
             localStorage.removeItem("token");
             reject(err);
           });
@@ -151,7 +152,7 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Произошла ошибка... Проверьте правильность введенных данных" });
             reject(err);
           });
       });
@@ -166,8 +167,7 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch(err => {
-            console.error(err);
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Произошла ошибка при получении данных... Обновите страницу" });
             reject(err);
           });
       });
@@ -181,7 +181,7 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Произошла ошибка при получении данных... Обновите страницу" });
             reject(err);
           });
       });
@@ -195,7 +195,7 @@ export default new Vuex.Store({
             resolve(resp.data);
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Произошла ошибка при остановке сессии... Повторите попытку" });
             reject(err);
           });
       });
@@ -209,7 +209,7 @@ export default new Vuex.Store({
             resolve(resp);
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Произошла ошибка при регистрации пользователя в сессии" });
             reject(err);
           });
       });
@@ -223,13 +223,13 @@ export default new Vuex.Store({
           .then(resp => {
             resolve(resp);
             if (resp.status == 200) {
-              commit("SET_SUCCESS", resp.data.message);
+              commit("SET_SUCCESS", { message: "Вопрос отправлен" });
             } else {
-              commit("SET_ERROR", resp.data.message);
+              commit("SET_ERROR", { message: `${resp.data.message}` });
             }
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Произошла ошибка отправки вопроса" });
             reject(err);
           });
       });
@@ -247,7 +247,7 @@ export default new Vuex.Store({
             }
           })
           .catch(err => {
-            commit("SET_ERROR", { messge: "Еще нет подключившихся пользователей, либо произошла ошибка" });
+            commit("SET_ERROR", { message: "Еще нет подключившихся пользователей, либо произошла ошибка" });
             reject(err);
           });
       });
@@ -259,13 +259,13 @@ export default new Vuex.Store({
           .then(resp => {
             resolve(resp);
             if (resp.status == 200) {
-              commit("SET_SUCCESS", resp.data.message);
+              commit("SET_SUCCESS", { message: "Ответы получены " + resp.data.message });
             } else {
-              commit("SET_ERROR", resp.data.message);
+              commit("SET_ERROR", { message: "Произошла ошибка при получении ответов на вопросы... Перезагрузите страницу" });
             }
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Ошибка при получении ответов" });
             reject(err);
           });
       });
@@ -276,10 +276,10 @@ export default new Vuex.Store({
           .put(`/test/${payload.id}/${payload.questionId}`, { mark: payload.mark, id: payload.answerId })
           .then(resp => {
             resolve(resp);
-            commit("SET_SUCCESS", resp.data.message);
+            commit("SET_SUCCESS", { message: "Ответ успешно оценен" });
           })
           .catch(err => {
-            commit("SET_ERROR", err);
+            commit("SET_ERROR", { message: "Ошибка при оценивании" });
             reject(err);
           });
       });

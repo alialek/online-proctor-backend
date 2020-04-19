@@ -25,8 +25,9 @@
 					</v-btn>
 				</div>
 			</div>
-
-			<router-view />
+			<v-container fluid>
+				<router-view />
+			</v-container>
 			<v-snackbar
 				style="z-index:3000"
 				:color="snackbar.color"
@@ -92,6 +93,8 @@ html {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+	background: linear-gradient(51.79deg, #655af3 -23.83%, #a59bff 92.58%);
+	// background: #1976d2;
 }
 
 .vs-button {
@@ -134,7 +137,7 @@ html {
 	width: 100%;
 	height: 100%;
 	padding-top: 9vh;
-	background: #1976d2;
+	// background: #1976d2;
 	// background: linear-gradient(51.79deg, #655af3 -23.83%, #a59bff 92.58%);
 }
 .wrapper {
@@ -185,5 +188,14 @@ html {
 	letter-spacing: normal !important;
 	text-transform: none !important;
 	justify-content: flex-start !important;
+}
+
+@media screen and (max-width: 599px) {
+	.header__logo {
+		font-size: 1rem;
+	}
+	.dashboard.wrapper {
+		margin-top: 25px !important;
+	}
 }
 </style>
