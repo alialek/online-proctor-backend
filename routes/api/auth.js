@@ -41,7 +41,7 @@ router.post(
     }
 
     const { email, password } = req.body;
-
+    email = email.toLowerCase();
     try {
       // Проверка на уникальность пользователя
       let user = await User.findOne({ email });

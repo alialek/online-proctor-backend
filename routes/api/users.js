@@ -59,6 +59,7 @@ router.post(
           id: user.id
         }
       };
+      email = email.toLowerCase();
       let newUser = await User.findOne({ email });
 
       jwt.sign(

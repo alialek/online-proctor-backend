@@ -58,6 +58,9 @@ export default {
 	font-family: "Segoe UI", sans-serif;
 	width: 100%;
 	height: 100vh;
+	position: absolute;
+	top: 0;
+	left: 0;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

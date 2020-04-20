@@ -259,7 +259,6 @@ router.post("/register/:id", auth, async (req, res) => {
   try {
     let test = await Test.findOne({ _id: req.params.id });
     let user = await User.findById(req.user.id);
-    console.log("check for test");
     let newParticipant = {
       userName: user.name,
       userId: req.user.id,

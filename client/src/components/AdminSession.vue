@@ -15,9 +15,17 @@
 					Время ответа: {{ session.timeToAnswer + " c." }}
 				</h2>
 				<v-spacer></v-spacer>
-				<h2 class="subtitle-2">
-					Участников: {{ session.participants.length }}
-				</h2>
+				<!-- <h2 class="subtitle-2"> -->
+				<v-tooltip bottom>
+					<template v-slot:activator="{ on }">
+						<h2 class="subtitle-2" v-on="on">
+							Участников : {{ session.participants.length }}
+						</h2>
+					</template>
+					{{ session.participants.map(item => item.userName).join(", ") }}
+				</v-tooltip>
+				<!-- Участников: {{ session.participants.length }} -->
+				<!-- </h2> -->
 				<v-spacer></v-spacer>
 				<h2 class="subtitle-2">
 					Статус сессии: {{ session.isActive ? "активна" : "неактивна" }}
