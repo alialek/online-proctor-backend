@@ -29,7 +29,7 @@ router.post(
     }
 
     let { name, email, password, tabId, group } = req.body;
-
+    email = email.toLowerCase();
     try {
       // Проверка на уникальность пользователя
       let user = await User.findOne({ email });
@@ -59,7 +59,8 @@ router.post(
           id: user.id
         }
       };
-      email = email.toLowerCase();
+      
+     
       let newUser = await User.findOne({ email });
 
       jwt.sign(
