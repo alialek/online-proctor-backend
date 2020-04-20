@@ -153,7 +153,7 @@ export default new Vuex.Store({
           .post("/test", payload)
           .then(resp => {
             commit("SET_SESSION", { session: resp.data });
-            commit("SET_SUCCESS", "Сессия успешно создана");
+            commit("SET_SUCCESS", {message: "Сессия успешно создана"});
             resolve(resp.data);
           })
           .catch(err => {
@@ -246,9 +246,9 @@ export default new Vuex.Store({
           .then(resp => {
             resolve(resp);
             if (resp.status == 200) {
-              commit("SET_SUCCESS", "Вопрос отправлен");
+              commit("SET_SUCCESS", {message: 'Вопрос отправлен'});
             } else {
-              commit("SET_ERROR", 'Еще нет подключившихся пользователей, либо произошла ошибка');
+              commit("SET_ERROR", {message: 'Еще нет подключившихся пользователей, либо произошла ошибка'});
             }
           })
           .catch(err => {
