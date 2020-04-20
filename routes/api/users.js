@@ -28,7 +28,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, tabId, group } = req.body;
+    let { name, email, password, tabId, group } = req.body;
 
     try {
       // Проверка на уникальность пользователя

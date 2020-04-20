@@ -40,7 +40,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    let { email, password } = req.body;
     email = email.toLowerCase();
     try {
       // Проверка на уникальность пользователя
