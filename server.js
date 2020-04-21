@@ -49,11 +49,12 @@ var wss = new WebSocketServer.Server({
 wss.on("connection", async function (ws, req) {
   ws.isAlive = true;
   ws.on("pong", heartbeat);
-  let testId = req.url.split("=")[1];
   console.log(req.headers)
+  try {
+    let testId = req.url.split("=")[1];
+  
   let token = req.headers.cookie.split("token=")[1].split(";")[0];
 
-  try {
     const decoded = jwt.verify(token, config.get("jwtSecret"));
     req.user = decoded.user;
     let user = await User.findById(req.user.id);
@@ -66,7 +67,9 @@ wss.on("connection", async function (ws, req) {
       ? (clients[testId] = [ws])
       : clients[testId].push(ws);
     console.log("новое соединение " + user.id);
-  } catch (err) {}
+  } catch (err) {
+    ws.send({'type':'error', 'message': 'Ошибка подключения к WSS, нет cookie'})
+  }
 });
 
 wss.on("close", function () {

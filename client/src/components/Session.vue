@@ -24,15 +24,15 @@
         </p>
         <v-card-text>
           <v-form @submit.prevent="sendAnswer">
-            <v-text-field
+            <v-textarea
               @paste="pasteEvent"
               v-model="answer"
               placeholder="Введите ответ"
               outlined
               autocomplete="off"
             >
-            </v-text-field>
-            <v-btn type="submit" color="success" depressed
+            </v-textarea>
+            <v-btn :loading="loading" type="submit" color="success" depressed
               >Ответить</v-btn
             ></v-form
           >
@@ -97,6 +97,7 @@
         this.newQuestion = false;
         this.noQuestion = false;
         this.stop = false;
+        this.loading = false;
       },
       sendAnswer() {
         this.$store
@@ -127,6 +128,7 @@
           this.value -= step;
           if (this.value < 1) {
             this.reset();
+            this.sendAnswer();
             this.noQuestion = true;
             this.answer = "";
             this.question = {};
@@ -157,16 +159,20 @@
         socket.onmessage = (event) => {
           let data = JSON.parse(event.data);
           this.reset();
+           if (data.type == "error") {
+             this.$store.commit('SET_ERROR', data)
+           }
           if (data.type == "question") {
             this.newQuestion = true;
             this.question = data;
             this.timer = true;
+            this.answer = '';
             this.startTimer();
             setTimeout(() => {
               this.disabled = false;
               clearInterval(this.interval);
               this.timer = false;
-            }, this.question.until * 1000 + 5);
+            }, this.question.until * 1000 - 3);
           } else if (data.type == "stop") {
             this.stop = true;
           }
@@ -205,6 +211,7 @@
         answer: "",
         question: {},
         tests: {},
+        loading: false
       };
     },
   };
