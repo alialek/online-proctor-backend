@@ -102,6 +102,7 @@
         this.loading = false;
       },
       sendAnswer() {
+        this.loading = true
         this.$store
           .dispatch("sendAnswer", {
             id: this.id,
