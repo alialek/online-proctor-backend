@@ -51,6 +51,7 @@ wss.on("connection", async function (ws, req) {
   ws.on("pong", heartbeat);
   console.log(req.headers)
   try {
+    console.log(ws.cookies)
     let testId = req.url.split("=")[1];
   
   let token = req.headers.cookie.split("token=")[1].split(";")[0];
