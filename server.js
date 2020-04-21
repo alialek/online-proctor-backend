@@ -52,7 +52,7 @@ wss.on("connection", async function (ws, req) {
   console.log(req.headers);
   console.log(req.cookies)
   try {
-    let testId = req.url.split("=")[1];
+    let testId = req.url.split("=")[1].split('&')[0];
     let token = req.url.split("=")[2]
    // let token = req.headers.cookie.split("token=")[1].split(";")[0];
 
