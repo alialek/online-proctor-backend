@@ -44,9 +44,6 @@ function noop() {}
 function heartbeat() {
   this.isAlive = true;
 }
-app.use(express.session({
-  cookie: { httpOnly: false }
-}));
 var wss = new WebSocketServer.Server({
   server: server,
 });
