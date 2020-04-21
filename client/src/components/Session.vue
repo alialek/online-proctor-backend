@@ -144,6 +144,7 @@
       startSocket() {
         var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
         socket.onopen = () => {
+          socket.send('Hi')
           this.$store.commit("SET_SUCCESS", {
             message: "Соединение установлено",
           });
