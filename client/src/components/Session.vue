@@ -142,7 +142,7 @@
         }, 1000);
       },
       startSocket() {
-        var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id);
+        var socket = new WebSocket("wss://app.netquest.ru/?id=" + this.id + '&token=' + localStorage.getItem("token"));
         socket.onopen = () => {
           socket.send('Hi')
           this.$store.commit("SET_SUCCESS", {

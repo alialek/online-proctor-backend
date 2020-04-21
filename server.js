@@ -2,7 +2,6 @@ const express = require("express");
 const connectDB = require("./config/db");
 const app = express();
 const path = require("path");
-const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const cors = require("cors");
@@ -13,7 +12,6 @@ const { Test, Question, Answer } = require("./models/Test");
 
 connectDB();
 app.use(cors());
-app.use(cookieParser());
 app.use(bodyParser());
 app.use(express.json({ extended: false }));
 
@@ -57,8 +55,8 @@ wss.on("connection", async function (ws, req) {
   console.log(req.cookies)
   try {
     let testId = req.url.split("=")[1];
-
-    let token = req.headers.cookie.split("token=")[1].split(";")[0];
+    let token = req.url.split("=")[2]
+   // let token = req.headers.cookie.split("token=")[1].split(";")[0];
 
     const decoded = jwt.verify(token, config.get("jwtSecret"));
     req.user = decoded.user;
