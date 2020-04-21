@@ -125,12 +125,15 @@
       startTimer() {
         clearInterval(this.interval);
         this.value = 100;
-        let step = 100 / this.question.until;
+        let step = 100 / (this.question.until - 7);
         this.interval = setInterval(() => {
           this.value -= step;
-          if (this.value < 2) {
+          if (this.value < 1) {
             this.sendAnswer();
             this.reset();
+            this.disabled = false;
+            clearInterval(this.interval);
+            this.timer = false;
 
             this.noQuestion = true;
             this.answer = "";
@@ -148,11 +151,11 @@
 
         socket.onclose = (event) => {
           if (event.wasClean) {
-            this.$store.commit("SET_SUCCESS", {
+            this.$store.commit("SET_ERROR", {
               message: "Соединение закрыто",
             });
           } else {
-            this.$store.commit("SET_SUCCESS", {
+            this.$store.commit("SET_ERROR", {
               message: "Соединение оборвалось",
             });
           }
@@ -171,11 +174,6 @@
             this.timer = true;
             this.answer = "";
             this.startTimer();
-            setTimeout(() => {
-              this.disabled = false;
-              clearInterval(this.interval);
-              this.timer = false;
-            }, this.question.until * 1000 - 5000);
           } else if (data.type == "stop") {
             this.stop = true;
           }

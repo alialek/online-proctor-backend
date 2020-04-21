@@ -286,7 +286,7 @@
                 this.disabled = false;
                 clearInterval(this.interval);
                 this.timer = false;
-              }, this.session.timeToAnswer * 1000 + 3);
+              }, this.session.timeToAnswer * 1000 + 3000);
             }
             this.$store.dispatch("getSession", this.id).then((data) => {
               this.session = data;
