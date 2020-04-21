@@ -40,7 +40,9 @@
       </v-card>
       <v-card class="mr-4" v-if="noQuestion">
         <v-card-title
-          ><p class="title pa-4" style="test-align:center; width: 100%">Ожидайте следующего вопроса!</p></v-card-title
+          ><p class="title pa-4" style="test-align:center; width: 100%">
+            Ожидайте следующего вопроса!
+          </p></v-card-title
         >
       </v-card>
       <v-card class="mr-4" v-if="stop">
@@ -126,9 +128,10 @@
         let step = 100 / this.question.until;
         this.interval = setInterval(() => {
           this.value -= step;
-          if (this.value < 1) {
-            this.reset();
+          if (this.value < 2) {
             this.sendAnswer();
+            this.reset();
+
             this.noQuestion = true;
             this.answer = "";
             this.question = {};
@@ -159,20 +162,20 @@
         socket.onmessage = (event) => {
           let data = JSON.parse(event.data);
           this.reset();
-           if (data.type == "error") {
-             this.$store.commit('SET_ERROR', data)
-           }
+          if (data.type == "error") {
+            this.$store.commit("SET_ERROR", data);
+          }
           if (data.type == "question") {
             this.newQuestion = true;
             this.question = data;
             this.timer = true;
-            this.answer = '';
+            this.answer = "";
             this.startTimer();
             setTimeout(() => {
               this.disabled = false;
               clearInterval(this.interval);
               this.timer = false;
-            }, this.question.until * 1000 - 3);
+            }, this.question.until * 1000 - 5000);
           } else if (data.type == "stop") {
             this.stop = true;
           }
@@ -211,7 +214,7 @@
         answer: "",
         question: {},
         tests: {},
-        loading: false
+        loading: false,
       };
     },
   };
