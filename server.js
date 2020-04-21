@@ -47,6 +47,9 @@ var wss = new WebSocketServer.Server({
   server: server,
 });
 wss.on("connection", async function (ws, req) {
+  ws.on("message", function (event) {
+    console.log(event);
+  });
   ws.isAlive = true;
   ws.on("pong", heartbeat);
   console.log(req.headers);
