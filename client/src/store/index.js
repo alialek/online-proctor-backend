@@ -85,7 +85,7 @@ export default new Vuex.Store({
             }
             // Можно убрать консоль логи?
             // console.log(`token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;secure;`)
-            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;path= ;`;
+            document.cookie = `token=${token};expires=Tue, 19 Jan 2038 03:14:07 GMT;samesite=None;secure`;
             // console.log(document.cookie)
             axios.defaults.headers.common["x-auth-token"] = token;
             commit("AUTH_SUCCESS", { token, user });
