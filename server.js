@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const app = express();
 const path = require("path");
+const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const cors = require("cors");
@@ -12,6 +13,7 @@ const { Test, Question, Answer } = require("./models/Test");
 
 connectDB();
 app.use(cors());
+app.use(cookieParser());
 app.use(bodyParser());
 app.use(express.json({ extended: false }));
 
@@ -42,7 +44,9 @@ function noop() {}
 function heartbeat() {
   this.isAlive = true;
 }
-
+app.use(express.session({
+  cookie: { httpOnly: false }
+}));
 var wss = new WebSocketServer.Server({
   server: server,
 });
@@ -53,6 +57,7 @@ wss.on("connection", async function (ws, req) {
   ws.isAlive = true;
   ws.on("pong", heartbeat);
   console.log(req.headers);
+  console.log(req.cookies)
   try {
     let testId = req.url.split("=")[1];
 
