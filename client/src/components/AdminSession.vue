@@ -159,6 +159,16 @@
           >
             <template v-slot:item.setmark="{ item }">
               <v-row>
+                 <v-col cols="3">
+                  <v-btn
+                    fab
+                    color="grey white--text"
+                    @click="setMark(item, 0, participant)"
+                    depressed
+                    x-small
+                    >0</v-btn
+                  ></v-col
+                >
                 <v-col cols="3">
                   <v-btn
                     fab
