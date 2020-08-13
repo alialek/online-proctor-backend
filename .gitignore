@@ -3,9 +3,9 @@ client/node_modules
 /client/node_modules
 .vscode
 node_modules
-/client
-/shapes
+client/
+shapes/
 /config/production.json
-/models/Location.js
-/models/Quest.js
-/routes/api/quest.js
+models/Location.js
+models/Quest.js
+routes/api/quest.js
