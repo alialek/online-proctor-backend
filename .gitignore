@@ -5,7 +5,7 @@ client/node_modules
 node_modules
 client/
 shapes/
-/config/production.json
+config/production.json
 models/Location.js
 models/Quest.js
 routes/api/quest.js
