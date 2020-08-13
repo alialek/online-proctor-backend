@@ -5,9 +5,8 @@ const isAdmin = require("../../middleware/isAdmin");
 const isAuthor = require("../../middleware/isAuthor");
 const { User } = require("../../models/User");
 const { Test, Question, Answer } = require("../../models/Test");
-const { check, validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const config = require("config");
+const { validationResult } = require("express-validator");
+
 
 //@route   POST api/test/
 //@desc    Создание теста

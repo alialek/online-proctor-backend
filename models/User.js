@@ -1,36 +1,6 @@
 const mongoose = require('mongoose');
 
-const userRiddleSchema = new mongoose.Schema({
-  id: {
-    type: String
-  },
-  timeStart: {
-    type: Date,
-    default: Date.now
-  },
-  timeFinish: {
-    type: Date
-  },
-  lastAnswer: {
-    type: String
-  },
-  isSolved: {
-    type: Boolean
-  }
-});
 
-const userQuestSchema = new mongoose.Schema({
-  id: {
-    type: Number
-  },
-  riddles: [userRiddleSchema],
-  amount: {
-    type: Number
-  },
-  solvedRiddles: {
-    type: Number
-  }
-});
 
 const userTestSchema = new mongoose.Schema({
   id: {
@@ -71,13 +41,9 @@ const UserSchema = new mongoose.Schema({
     default: false
   },
   tests: [],
-  quests: [userQuestSchema]
 });
 
-// const userQuest = mongoose.model('userQuest', userQuestSchema);
-// const userRiddle = mongoose.model('userRiddle', userRiddleSchema);
-// const userTest = mongoose.model('userTest', userTestSchema);
+
 
 module.exports = {User: mongoose.model('user', UserSchema),
-Riddle: mongoose.model('riddle', userRiddleSchema),
 Test: mongoose.model('test', userTestSchema)}

@@ -7,7 +7,7 @@ module.exports = async function(req, res, next) {
   console.log(req.params)
 
   if (!token) {
-    res.status(401).json({ msg: "No token, auth denied" });
+    res.status(401).json({ msg: "Нет токена" });
   }
 
   try {
@@ -21,6 +21,6 @@ module.exports = async function(req, res, next) {
     }
   } catch (err) {
     console.log(err)
-    res.status(401).json({ msg: "Token is not valid" });
+    res.status(401).json({ msg: "Токен невалидный" });
   }
 };
