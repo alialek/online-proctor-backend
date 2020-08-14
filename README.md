@@ -1,4 +1,4 @@
-# online-proctor-backend
+# Система онлайн-тестирования
 Node.js API сервер для системы тестирования. Frontend лежит [тут](https://github.com/alialek/online-proctor)
 
 Стэк:
